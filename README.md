@@ -10,6 +10,6 @@ Wireless controller and update functionality is planned for the future, when usi
 It maintains the original power LED and communicates the region setting via quick blinking, so there's no need to change anything about
 the external appearance of the console. It should look exactly the same afterwards.
 
-An installation diagram is provided [here](doc/install%20plan.svg). It is for VA 6.5, check out other switchless mod install guides for other revisions/models.
+An installation diagram is provided [here](doc/install%20plan.png). It is for VA 6.5, check out other switchless mod install guides for other revisions/models.
 
 For more info on this mod, and the thought process, check out the [blog post](https://camargo.eng.br/blog/2023/11-18-pal-megadrive.html).
