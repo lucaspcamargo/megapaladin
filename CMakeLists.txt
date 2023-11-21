@@ -8,14 +8,21 @@ project(megapaladin VERSION 2)
 pico_sdk_init()
 
 add_executable(megapaladin
-    src/main.c
+    src/core0.c
     src/core1.c
-    src/utils.c
+    src/support.c
     src/button.c
 )
 
-# Add pico_stdlib library which aggregates commonly used features
-target_link_libraries(megapaladin pico_stdlib)
+target_link_libraries(megapaladin 
+    pico_stdlib
+    pico_multicore
+    hardware_adc
+)
+
+# use usb serial, not uart
+pico_enable_stdio_usb(megapaladin 1)
+pico_enable_stdio_uart(megapaladin 0)
 
 # create map/bin/hex/uf2 file in addition to ELF.
 pico_add_extra_outputs(megapaladin)

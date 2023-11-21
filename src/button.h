@@ -1,78 +1,22 @@
 #pragma once
 
-#define BUTTON_DEBOUNCE_MILLIS 50
+#include "defs.h"
 
-template <int PIN, bool PULLUP = (PIN==13) >
-class ButtonTemplate
+enum ButtonFlags
 {
-    enum Flags
-    {
-        F_PRESSED       = 0x01,
-        F_WAS_PRESSED   = 0x02,
-        F_WAS_RELEASED  = 0x04
-    };
+    F_PRESSED       = 0x01,
+    F_WAS_PRESSED   = 0x02,
+    F_WAS_RELEASED  = 0x04
+};
 
-public:
-    ButtonTemplate()
-    {
-        pinMode( PIN, PULLUP? INPUT_PULLUP : INPUT );
-        m_lastPress = 0;
-        m_lastPressTime = 0;
-        m_flags = 0;
-    }
+void btn_init();
 
-    ~ButtonTemplate() { /* do nothing */ }
+void btn_update( uint64_t now );
 
-    void update( ulong now )
-    {
-        bool pressedNow = !digitalRead( PIN );
-        if( pressedNow && ! (m_flags & F_PRESSED) )
-        {
-            // is pressed, wasn't before
-            if(now - m_lastPress > BUTTON_DEBOUNCE_MILLIS)
-            {
-                m_flags |= (F_WAS_PRESSED | F_PRESSED);
-                m_lastPress = now;
-            }
-        }
-        else if( !pressedNow && (m_flags & F_PRESSED) )
-        {
-            // is not pressed, was before
-            if(now - m_lastPress > BUTTON_DEBOUNCE_MILLIS)
-            {
-                m_flags &= ~(F_PRESSED);
-                m_flags |= F_WAS_RELEASED;
-                m_lastPressTime = now - m_lastPress;
-            }
-        }
-    }
+bool btn_was_pressed();
 
-    bool wasPressed()
-    {
-        bool ret = m_flags & F_WAS_PRESSED;
-        m_flags &= ~F_WAS_PRESSED;
-        return ret;
-    }
+bool btn_is_pressed();
 
-    bool isPressed() const
-    {
-        return m_flags & F_PRESSED;
-    }
+uint64_t btn_last_press_duration();
 
-    ulong lastPressDuration() const
-    {
-        return m_lastPressTime;
-    }
-
-    bool wasReleased()
-    {
-        bool ret = m_flags & F_WAS_RELEASED;
-        m_flags &= ~F_WAS_RELEASED;
-        return ret;
-    }
-
-private:
-    ulong m_lastPress;
-    ulong m_lastPressTime;
-    byte m_flags;
-}; 
+bool btn_was_released();

@@ -1,17 +1,18 @@
 #pragma once
 
-#include "pico/types.h"
+#include <pico/types.h>
 
 #define MP_VERSION 1
 
 // CONFIGS
-#define IS_PICO_W 1
-#define SERIAL_INIT_TIMEOUT 1000
-#define SERIAL_OUT_DELAY 300
-#define BLINK_DURATION_MS 50
-#define BLINK_INTERVAL_MS 100
-#define CMD_BUF_SZ 64
+#define IS_PICO_W (PICO_BOARD == "pico_w")
 #define DEFAULT_REGION REGION_US
+#define CMD_BUF_SZ 64
+
+#define BUTTON_DEBOUNCE_US 50000        // 0.05s
+#define BLINK_DURATION_US 50000         // 0.05s
+#define BLINK_INTERVAL_US 100000        // 0.1s
+#define SERIAL_INIT_TIMEOUT_US 1000000  // 1s
 
 #define PIN_IN_RESET 18
 #define PIN_OUT_RESET 19
