@@ -32,3 +32,12 @@ float temp_read()
     float adc = (float)adc_read() * conversionFactor;
     return 27.0f - (adc - 0.706f) / 0.001721f;
 }
+
+
+#define REG_AIRCR (*((volatile uint32_t*)(PPB_BASE + 0x0ED0C)))
+
+void reboot()
+{
+    //watchdog_reboot(0,0,0); instead: do this:
+    REG_AIRCR = 0x5FA0004;
+}

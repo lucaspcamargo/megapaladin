@@ -1,18 +1,29 @@
 #include "defs.h"
 #include "button.h"
+#include "support.h"
 
 #include <pico/stdlib.h>
+#include <pico/multicore.h>
 #include <hardware/gpio.h>
 #include <hardware/pwm.h>
-
-enum Region region_curr = DEFAULT_REGION;
-enum Region region_sel = DEFAULT_REGION;
 
 const unsigned char region_mapping[][2] = {
     {LANG_EN, FMT_NTSC}, // REGION_US
     {LANG_EN, FMT_PAL},  // REGION_EU
     {LANG_JP, FMT_NTSC}  // REGION_JP
 };
+enum PwrLEDState
+{
+    PLS_STEADY,
+    PLS_BLINKING,
+    PLS_DRONING
+} __attribute__((packed));
+
+enum Region region_curr = DEFAULT_REGION;
+enum Region region_sel = DEFAULT_REGION;
+enum PwrLEDState pwrled_state;
+uint64_t pwrled_state_timer;
+uint32_t pwrled_state_data;
 
 void core1_init();
 void core1_loop();
@@ -57,7 +68,11 @@ void core1_init()
     pwm_config config = pwm_get_default_config();
     pwm_config_set_clkdiv(&config, 4.f);
     pwm_init(slice_num, &config, true);
-    pwm_set_gpio_level(PIN_OUT_PWR_LED, PWM_FULLBRIGHT);
+
+    pwrled_state = PLS_STEADY;
+    pwrled_state_timer = 0;
+    pwrled_state_data = 0;
+    core1_pwrled_update(0);
 }
 
 void core1_loop()
@@ -75,14 +90,13 @@ void core1_loop()
 
         // TODO on release, clear sync sent during press flag
     }
-    //TODO else if(btn_is_pressed() && btn is held for more than threshold && ! sync sent during press) 
-    //              send_bt_sync_command();
+    // TODO else if(btn_is_pressed() && btn is held for more than threshold && ! sync sent during press)
+    //               send_bt_sync_command();
 
     core1_pwrled_update();
 
     FIFOCmd core0_cmd;
-    /* TODO 
-    if (rp2040.fifo.pop_nb(reinterpret_cast<uint32_t *>(&core0_cmd)))
+    while (multicore_fifo_pop_timeout_us(FIFO_TIMEOUT_US, (uint32_t *)&core0_cmd))
     {
         switch (core0_cmd.opcode)
         {
@@ -90,32 +104,36 @@ void core1_loop()
         {
             FIFOCmd reply;
             reply.opcode = FC_STATUS_REPL;
-            rp2040.fifo.push(*reinterpret_cast<uint32_t *>(&reply));
+            reply.data[0] = region_curr;
+            reply.data[1] = region_sel;
+            reply.data[2] = 0;
+            multicore_fifo_push_blocking(fifo_pack(&reply));
         }
         break;
-        case FC_POWER_LED_BLINK:
+        case FC_REGION_SELECT:
         {
-            // TODO do this with a state machine in the loop, without blocking
-            uint8_t times = core0_cmd.data[0];
-            while (times)
-            {
-                digitalWrite(PIN_OUT_PWR_LED, LOW);
-                delay(BLINK_DURATION_MS);
-                digitalWrite(PIN_OUT_PWR_LED, HIGH);
-                if (times)
-                    delay(BLINK_INTERVAL_MS);
-            }
+            core1_region_select((enum Region) core0_cmd.data[0]);
+        }
+        break;
+        case FC_REGION_COMMIT:
+        {
+            core1_region_commit();
+        }
+        break;
+        case FC_RESET:
+        {
+            core1_do_reset();
         }
         break;
         }
-    } */
+    }
 }
 
 void core1_region_commit()
 {
     region_curr = region_sel;
-    gpio_put(PIN_OUT_LANG, (bool) region_mapping[region_curr][0]);
-    gpio_put(PIN_OUT_FMT, (bool) region_mapping[region_curr][1]);
+    gpio_put(PIN_OUT_LANG, (bool)region_mapping[region_curr][0]);
+    gpio_put(PIN_OUT_FMT, (bool)region_mapping[region_curr][1]);
 }
 
 void core1_region_select(enum Region r)
@@ -135,14 +153,44 @@ void core1_do_reset()
 
     gpio_set_dir(PIN_OUT_RESET, GPIO_OUT);
     gpio_put(PIN_OUT_RESET, false);
-    sleep_ms(RESET_DURATION_MS); // TODO move to mainloop processing
+    sleep_ms(RESET_DURATION_MS);          // TODO move to mainloop processing
     gpio_set_dir(PIN_OUT_RESET, GPIO_IN); // back to hi-z
 }
 
-
 void core1_pwrled_update()
 {
-    // TODO step fsm
+    static enum PwrLEDState prev_state = PLS_STEADY;
+    unsigned long now = time_us_64();
+
+    switch (pwrled_state)
+    {
+    case PLS_STEADY:
+        if(prev_state != PLS_STEADY)
+            pwm_set_gpio_level(PIN_OUT_PWR_LED, PWM_FULLBRIGHT);
+        break;
+    case PLS_BLINKING:
+    {
+        uint64_t delta = now - pwrled_state_timer;
+        static const uint64_t blink_period = (BLINK_DURATION_US+BLINK_INTERVAL_US);
+        uint64_t max_delta = blink_period * pwrled_state_data;
+        if(delta > max_delta)
+        {
+            pwrled_state = PLS_STEADY;
+            pwrled_state_data = 0;
+            pwrled_state_timer = 0;
+        }
+        else
+        {
+            uint64_t periodic = delta % blink_period;
+            pwm_set_gpio_level(PIN_OUT_PWR_LED, periodic > BLINK_DURATION_US? PWM_FULLBRIGHT : 0);
+        }
+    }
+    break;
+    case PLS_DRONING:
+        pwm_set_gpio_level(PIN_OUT_PWR_LED, PWM_FULLBRIGHT/4); // TODO sweep
+
+    }
+    prev_state = pwrled_state;
 }
 
 void core1_pwrled_blink(uint times)

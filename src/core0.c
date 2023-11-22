@@ -5,6 +5,7 @@
 #include <string.h>
 #include <pico/stdlib.h>
 #include <pico/multicore.h>
+#include <hardware/watchdog.h>
 
 
 char cmd_buf[CMD_BUF_SZ];
@@ -31,14 +32,15 @@ int main() // for core 0
     if (usb_uart_ok)
     {
         while ((time_us_64() - serial_setup_start < SERIAL_INIT_TIMEOUT_US) && !stdio_usb_connected())
-            ;
+            tight_loop_contents();
         printf("\nmegaPALadin V%d\n", MP_VERSION);
     }
 
     // finishing touches
     temp_init();
 
-    for(;;); // TODO tend to serial
+    for(;;)
+        tight_loop_contents(); // TODO setup bluetooth stuff
 
     return 0;
 }
@@ -48,7 +50,7 @@ void core0_process_core1_cmd(const FIFOCmd repl)
     switch (repl.opcode)
     {
     case FC_STATUS_REPL:
-        // TODO print status with info from core1
+        core0_status_print((enum Region)repl.data[0],(enum Region)repl.data[1]);
         break;
     default:
         printf("Core 0: unknown opcode from core 1: %d\n", (int)repl.opcode);
@@ -59,38 +61,44 @@ void core0_process_serial_cmd()
 {
     if (!strcmp(cmd_buf, "status"))
     {
-        // TODO request status from core 1, then call with args later core0_status_print();
+        FIFOCmd c = {FC_STATUS_REQ, 0, 0, 0};
+        multicore_fifo_push_blocking(fifo_pack(&c));
     }
     else if (!strcmp(cmd_buf, "reset"))
     {
-        // TODO send reset command to core 1
+        FIFOCmd c = {FC_RESET, 0, 0, 0};
+        multicore_fifo_push_blocking(fifo_pack(&c));
         printf("Applied region, and resetted console.\n");
     }
     else if (!strcmp(cmd_buf, "us"))
     {
+        FIFOCmd c = {FC_REGION_SELECT, REGION_US, 0, 0};
+        multicore_fifo_push_blocking(fifo_pack(&c));
         printf("Selected US region\n");
-        //sel_region = REGION_US; TODO
-        //blinkPowerLed(sel_region + 1);
     }
     else if (!strcmp(cmd_buf, "eu"))
     {
+        FIFOCmd c = {FC_REGION_SELECT, REGION_EU, 0, 0};
+        multicore_fifo_push_blocking(fifo_pack(&c));
         printf("Selected EU region\n");
-        //sel_region = REGION_EU; TODO
-        //blinkPowerLed(sel_region + 1);
     }
     else if (!strcmp(cmd_buf, "jp"))
     {
+        FIFOCmd c = {FC_REGION_SELECT, REGION_JP, 0, 0};
+        multicore_fifo_push_blocking(fifo_pack(&c));
         printf("Selected JP region\n");
-        //sel_region = REGION_JP; TODO
-        //blinkPowerLed(sel_region + 1);
     }
     else if (!strcmp(cmd_buf, "reboot"))
     {
         printf("Rebooting the megaPALadin and the console.\n");
-        // TODO sel_region = DEFAULT_REGION;
-        // TODO doReset();
-        // TODO wait for reset signal duration
-        // TODO rp2040.restart();
+        FIFOCmd c = {FC_REGION_SELECT, DEFAULT_REGION, 0, 0};
+        multicore_fifo_push_blocking(fifo_pack(&c));
+        c.opcode = FC_RESET;
+        c.data[0] = 0;
+        multicore_fifo_push_blocking(fifo_pack(&c));
+        // wait for core 1 to reset, add some safety margin
+        sleep_ms(RESET_DURATION_MS + (RESET_DURATION_MS/4));
+        reboot();
     }
     else if ((!strcmp(cmd_buf, "help")) || (!strcmp(cmd_buf, "?")))
     {

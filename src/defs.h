@@ -14,6 +14,7 @@
 #define BLINK_INTERVAL_US 100000        // 0.1s
 #define SERIAL_INIT_TIMEOUT_US 1000000  // 1s
 #define RESET_DURATION_MS 200           // 0.2s
+#define FIFO_TIMEOUT_US 10              // 0.00001 s
 
 #define PWM_FULLBRIGHT 0xfffe
 
@@ -55,8 +56,18 @@ typedef struct FIFOCmd_t
 enum FIFOCmdOpcode
 {
   FC_NOP = 0,
+  
   FC_STATUS_REQ, // 0->1
   FC_STATUS_REPL, // 1->0
+
   FC_REGION_SELECT, // 0->1
   FC_REGION_COMMIT, // 0->1
+  FC_RESET, // 0->1
+
+  FC_SYNC_START_REQ,  // 1->0
+  FC_SYNC_STOP_REQ,  // 1->0
+  FC_SYNC_STATUS_REPL,  // 0->1, whether sync is in progress, can stop by itself
+
+  FC_JOY_HOST_STATUS, // 0->1, update connected devices info
+  FC_JOY_HOST_EVENT,  // 0->1, information concerning new controllers
 } __attribute__ ((packed));
