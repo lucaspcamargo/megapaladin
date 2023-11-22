@@ -17,7 +17,8 @@ add_executable(megapaladin
 target_link_libraries(megapaladin 
     pico_stdlib
     pico_multicore
-    hardware_adc
+    hardware_adc    # internal temp reading
+    hardware_pwm    # for power led
 )
 
 # use usb serial, not uart

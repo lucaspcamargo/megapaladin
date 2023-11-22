@@ -3,6 +3,7 @@
 
 #include <pico/stdlib.h>
 #include <hardware/gpio.h>
+#include <hardware/pwm.h>
 
 enum Region region_curr = DEFAULT_REGION;
 enum Region region_sel = DEFAULT_REGION;
@@ -19,6 +20,8 @@ void core1_region_commit();
 void core1_region_select(enum Region r);
 void core1_region_advance();
 void core1_do_reset();
+void core1_pwrled_update();
+void core1_pwrled_blink(uint times);
 
 void core1_main()
 {
@@ -29,18 +32,32 @@ void core1_main()
 
 void core1_init()
 {
+    // (re)init region outputs and commit initial values
     gpio_init(PIN_OUT_FMT);
     gpio_set_dir(PIN_OUT_FMT, GPIO_OUT);
     gpio_init(PIN_OUT_LANG);
-    gpio_set_dir(PIN_OUT_LANG, OUTPUT);
+    gpio_set_dir(PIN_OUT_LANG, GPIO_OUT);
     core1_region_commit();
 
-    pinMode(PIN_OUT_RESET, INPUT);
-    digitalWrite(PIN_OUT_RESET, LOW);
-    pinMode(PIN_IN_RESET, INPUT_PULLUP);
+    // reset out starts as input (hi-z)
+    gpio_init(PIN_OUT_RESET);
+    gpio_set_dir(PIN_OUT_RESET, GPIO_IN);
+    gpio_set_pulls(PIN_OUT_RESET, false, false);
 
-    pinMode(PIN_OUT_PWR_LED, OUTPUT);
-    digitalWrite(PIN_OUT_PWR_LED, HIGH);
+    // reset in is input with pullup
+    gpio_init(PIN_IN_RESET);
+    gpio_set_dir(PIN_IN_RESET, GPIO_IN);
+    gpio_set_pulls(PIN_IN_RESET, true, false);
+
+    // power led out is pwm out
+    gpio_set_function(PIN_OUT_PWR_LED, GPIO_FUNC_PWM);
+    uint slice_num = pwm_gpio_to_slice_num(PIN_OUT_PWR_LED);
+    pwm_clear_irq(slice_num);
+    pwm_set_irq_enabled(slice_num, false);
+    pwm_config config = pwm_get_default_config();
+    pwm_config_set_clkdiv(&config, 4.f);
+    pwm_init(slice_num, &config, true);
+    pwm_set_gpio_level(PIN_OUT_PWR_LED, PWM_FULLBRIGHT);
 }
 
 void core1_loop()
@@ -55,7 +72,13 @@ void core1_loop()
             core1_do_reset();
         else
             core1_region_advance();
+
+        // TODO on release, clear sync sent during press flag
     }
+    //TODO else if(btn_is_pressed() && btn is held for more than threshold && ! sync sent during press) 
+    //              send_bt_sync_command();
+
+    core1_pwrled_update();
 
     FIFOCmd core0_cmd;
     /* TODO 
@@ -91,14 +114,14 @@ void core1_loop()
 void core1_region_commit()
 {
     region_curr = region_sel;
-    digitalWrite(PIN_OUT_LANG, region_mapping[region_curr][0]);
-    digitalWrite(PIN_OUT_FMT, region_mapping[region_curr][1]);
+    gpio_put(PIN_OUT_LANG, (bool) region_mapping[region_curr][0]);
+    gpio_put(PIN_OUT_FMT, (bool) region_mapping[region_curr][1]);
 }
 
 void core1_region_select(enum Region r)
 {
     region_sel = r;
-    // TODO blinkPowerLed(region_sel + 1);
+    core1_pwrled_blink(region_sel + 1);
 }
 
 void core1_region_advance()
@@ -108,9 +131,21 @@ void core1_region_advance()
 
 void core1_do_reset()
 {
-    core1_region_output();
-    pinMode(PIN_OUT_RESET, OUTPUT);
-    digitalWrite(PIN_OUT_RESET, LOW);
-    delay(200);
-    pinMode(PIN_OUT_RESET, INPUT);
+    core1_region_commit();
+
+    gpio_set_dir(PIN_OUT_RESET, GPIO_OUT);
+    gpio_put(PIN_OUT_RESET, false);
+    sleep_ms(RESET_DURATION_MS); // TODO move to mainloop processing
+    gpio_set_dir(PIN_OUT_RESET, GPIO_IN); // back to hi-z
+}
+
+
+void core1_pwrled_update()
+{
+    // TODO step fsm
+}
+
+void core1_pwrled_blink(uint times)
+{
+    // TODO setup fsm
 }

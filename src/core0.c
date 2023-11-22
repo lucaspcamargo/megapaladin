@@ -15,7 +15,7 @@ bool usb_uart_ok = false;
 void core1_main();
 void core0_process_core1_cmd(const FIFOCmd repl);
 void core0_process_serial_cmd();
-void core0_status_print();
+void core0_status_print(enum Region curr_region, enum Region sel_region);
 
 int main() // for core 0
 {
@@ -48,7 +48,7 @@ void core0_process_core1_cmd(const FIFOCmd repl)
     switch (repl.opcode)
     {
     case FC_STATUS_REPL:
-        printf("Auxiliary core is running.\n");
+        // TODO print status with info from core1
         break;
     default:
         printf("Core 0: unknown opcode from core 1: %d\n", (int)repl.opcode);
@@ -63,7 +63,7 @@ void core0_process_serial_cmd()
     }
     else if (!strcmp(cmd_buf, "reset"))
     {
-        doReset();
+        // TODO send reset command to core 1
         printf("Applied region, and resetted console.\n");
     }
     else if (!strcmp(cmd_buf, "us"))
@@ -89,6 +89,7 @@ void core0_process_serial_cmd()
         printf("Rebooting the megaPALadin and the console.\n");
         // TODO sel_region = DEFAULT_REGION;
         // TODO doReset();
+        // TODO wait for reset signal duration
         // TODO rp2040.restart();
     }
     else if ((!strcmp(cmd_buf, "help")) || (!strcmp(cmd_buf, "?")))
@@ -103,9 +104,9 @@ void core0_process_serial_cmd()
 
 void core0_status_print(enum Region curr_region, enum Region sel_region)
 {
-    printf("Current region: %s\n", regionToStr(curr_region));
-    printf("Selected region: %s\n", regionToStr(sel_region));
-    // TODO
+    printf("Current region: %s\n", region_str(curr_region));
+    printf("Selected region: %s\n", region_str(sel_region));
+    // TODO port from arduino-pico
     // printf("Heap mem: ", rp2040.getFreeHeap()," free, ", rp2040.getTotalHeap(), " total");
     printf("Core temperature: %2.1fC\n", temp_read());
 }

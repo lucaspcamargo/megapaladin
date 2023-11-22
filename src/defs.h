@@ -13,6 +13,9 @@
 #define BLINK_DURATION_US 50000         // 0.05s
 #define BLINK_INTERVAL_US 100000        // 0.1s
 #define SERIAL_INIT_TIMEOUT_US 1000000  // 1s
+#define RESET_DURATION_MS 200           // 0.2s
+
+#define PWM_FULLBRIGHT 0xfffe
 
 #define PIN_IN_RESET 18
 #define PIN_OUT_RESET 19

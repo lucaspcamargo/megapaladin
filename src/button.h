@@ -19,4 +19,6 @@ bool btn_is_pressed();
 
 uint64_t btn_last_press_duration();
 
+uint64_t btn_curr_press_duration( uint64_t now );
+
 bool btn_was_released();
