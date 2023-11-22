@@ -1,0 +1,1 @@
+../thirdparty/bluepad32/examples/pico_w/src/sdkconfig.h
