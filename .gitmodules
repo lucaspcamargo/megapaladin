@@ -1,3 +1,6 @@
 [submodule "thirdparty/pico-sdk"]
 	path = thirdparty/pico-sdk
 	url = https://github.com/raspberrypi/pico-sdk.git
+[submodule "thirdparty/bluepad32"]
+	path = thirdparty/bluepad32
+	url = https://github.com/ricardoquesada/bluepad32.git
