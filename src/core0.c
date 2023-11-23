@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <malloc.h>
 #include <pico/stdlib.h>
 #include <pico/multicore.h>
 #include <pico/flash.h>
@@ -159,7 +160,6 @@ void core0_process_serial_cmd()
     }
     else if ((!strcmp(cmd_buf, "help")) || (!strcmp(cmd_buf, "?")))
     {
-        printf("\nmegaPALadin V%d\n", MP_VERSION);
         printf("Available commands: status, reset, us, eu, jp, reboot, help, ?\n");
     }
     else
@@ -170,9 +170,10 @@ void core0_process_serial_cmd()
 
 void core0_status_print(enum Region curr_region, enum Region sel_region)
 {
+    printf("\nmegaPALadin V%d\n", MP_VERSION);
     printf("Current region: %s\n", region_str(curr_region));
     printf("Selected region: %s\n", region_str(sel_region));
-    // TODO port from arduino-pico
-    // printf("Heap mem: ", rp2040.getFreeHeap()," free, ", rp2040.getTotalHeap(), " total");
+    struct mallinfo mi = mallinfo();
+    printf("Heap mem: ", mi.fordblks," free, ", mi.arena, " total");
     printf("Core temperature: %2.1fC\n", temp_read());
 }
