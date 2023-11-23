@@ -5,6 +5,7 @@
 #include <string.h>
 #include <pico/stdlib.h>
 #include <pico/multicore.h>
+#include <pico/flash.h>
 #include <hardware/watchdog.h>
 
 #include <btstack_run_loop.h>
@@ -35,8 +36,9 @@ void core1_main();
 int main() // for core 0
 {
     // as soon as possible, get code in core 1 running (control)
-    core1_preinit();
-
+    multicore_launch_core1(core1_main);
+    flash_safe_execute_core_init();
+    
     // now setup core 0
     cmd_buf_len = 0;
 
@@ -62,9 +64,6 @@ int main() // for core 0
     sleep_ms(500);
     cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
     sleep_ms(500);
-
-    // start core 1, the time-critical one
-    multicore_launch_core1(core1_main);
 
     // Must be called before uni_init()
     uni_platform_set_custom(bt_platform_get());

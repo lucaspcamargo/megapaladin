@@ -4,6 +4,7 @@
 
 #include <pico/stdlib.h>
 #include <pico/multicore.h>
+#include <pico/flash.h>
 #include <hardware/gpio.h>
 #include <hardware/pwm.h>
 
@@ -43,7 +44,7 @@ void core1_main()
 
 void core1_preinit()
 {
-    // this can be called from other contexts to initialize essential seignals as soon as possible
+    // this can be called from other contexts to initialize essential signals as soon as possible
 
     // init region outputs and commit initial values
     gpio_init(PIN_OUT_FMT);
@@ -56,6 +57,7 @@ void core1_preinit()
 void core1_init()
 {
     core1_preinit();
+    flash_safe_execute_core_init();
 
     // reset out starts as input (hi-z)
     gpio_init(PIN_OUT_RESET);
