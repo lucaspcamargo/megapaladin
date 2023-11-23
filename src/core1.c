@@ -41,14 +41,21 @@ void core1_main()
         core1_loop();
 }
 
-void core1_init()
+void core1_preinit()
 {
-    // (re)init region outputs and commit initial values
+    // this can be called from other contexts to initialize essential seignals as soon as possible
+
+    // init region outputs and commit initial values
     gpio_init(PIN_OUT_FMT);
     gpio_set_dir(PIN_OUT_FMT, GPIO_OUT);
     gpio_init(PIN_OUT_LANG);
     gpio_set_dir(PIN_OUT_LANG, GPIO_OUT);
     core1_region_commit();
+}
+
+void core1_init()
+{
+    core1_preinit();
 
     // reset out starts as input (hi-z)
     gpio_init(PIN_OUT_RESET);

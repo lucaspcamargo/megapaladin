@@ -28,7 +28,7 @@ target_include_directories(megapaladin PRIVATE
 
 # Needed for btstack_config.h / sdkconfig.h
 # so that libblupad32 can include them
-include_directories(bluepad32_picow_app src)
+include_directories(megapaladin src)
 
 target_link_libraries(megapaladin 
     pico_stdlib

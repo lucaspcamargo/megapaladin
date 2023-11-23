@@ -8,6 +8,7 @@
 #define IS_PICO_W (PICO_BOARD == "pico_w")
 #define DEFAULT_REGION REGION_US
 #define CMD_BUF_SZ 64
+#define CORE0_MAIN_TIMER_INTERVAL 1000
 
 #define BUTTON_DEBOUNCE_US 50000        // 0.05s
 #define BLINK_DURATION_US 50000         // 0.05s
