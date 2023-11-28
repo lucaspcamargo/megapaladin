@@ -4,3 +4,6 @@
 [submodule "thirdparty/bluepad32"]
 	path = thirdparty/bluepad32
 	url = https://github.com/ricardoquesada/bluepad32.git
+[submodule "thirdparty/picotool"]
+	path = thirdparty/picotool
+	url = https://github.com/raspberrypi/picotool.git

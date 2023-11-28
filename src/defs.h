@@ -34,19 +34,19 @@ enum Region
   REGION_EU,
   REGION_JP,
   REGION_COUNT
-};
+} __attribute__ ((packed));
 
 enum Language
 {
   LANG_JP = 0,
   LANG_EN = 1  
-};
+} __attribute__ ((packed));
 
 enum Format
 {
   FMT_PAL = 0,
   FMT_NTSC = 1
-};
+} __attribute__ ((packed));
 
 typedef struct FIFOCmd_t
 {

@@ -26,6 +26,7 @@ enum PwrLEDState pwrled_state;
 uint64_t pwrled_state_timer;
 uint32_t pwrled_state_data;
 
+void core1_preinit();
 void core1_init();
 void core1_loop();
 void core1_region_commit();
@@ -34,6 +35,7 @@ void core1_region_advance();
 void core1_do_reset();
 void core1_pwrled_update();
 void core1_pwrled_blink(uint times);
+
 
 void core1_main()
 {
@@ -81,7 +83,8 @@ void core1_init()
     pwrled_state = PLS_STEADY;
     pwrled_state_timer = 0;
     pwrled_state_data = 0;
-    core1_pwrled_update(0);
+    pwm_set_gpio_level(PIN_OUT_PWR_LED, PWM_FULLBRIGHT);
+    core1_pwrled_update();
 }
 
 void core1_loop()
@@ -92,7 +95,7 @@ void core1_loop()
     if (btn_was_released())
     {
         unsigned long pressedTime = btn_last_press_duration();
-        if (pressedTime < 400)
+        if (pressedTime < 400000)
             core1_do_reset();
         else
             core1_region_advance();
@@ -160,9 +163,11 @@ void core1_do_reset()
 {
     core1_region_commit();
 
+    gpio_set_pulls(PIN_IN_RESET, false, false);
     gpio_set_dir(PIN_OUT_RESET, GPIO_OUT);
     gpio_put(PIN_OUT_RESET, false);
     sleep_ms(RESET_DURATION_MS);          // TODO move to mainloop processing
+    gpio_set_pulls(PIN_IN_RESET, true, false);
     gpio_set_dir(PIN_OUT_RESET, GPIO_IN); // back to hi-z
 }
 
@@ -196,13 +201,18 @@ void core1_pwrled_update()
     }
     break;
     case PLS_DRONING:
-        pwm_set_gpio_level(PIN_OUT_PWR_LED, PWM_FULLBRIGHT/4); // TODO sweep
-
+    {
+        int ms = (time_us_64()>>10)%1024;
+        ms = (ms>=512?1023-ms:ms)/2;
+        pwm_set_gpio_level(PIN_OUT_PWR_LED, ms*ms);
+    }
     }
     prev_state = pwrled_state;
 }
 
 void core1_pwrled_blink(uint times)
 {
-    // TODO setup fsm
+    pwrled_state = PLS_BLINKING;
+    pwrled_state_data = times;
+    pwrled_state_timer = time_us_64();
 }

@@ -26,7 +26,7 @@ char cmd_buf[CMD_BUF_SZ];
 uint8_t cmd_buf_len;
 bool usb_uart_ok = false;
 
-void core0_btstack_timer(struct btstack_timer_source *);
+void core0_btstack_timer(btstack_timer_source_t *);
 void core0_process_core1_cmd(const FIFOCmd repl);
 void core0_process_serial_cmd();
 void core0_status_print(enum Region curr_region, enum Region sel_region);
@@ -85,18 +85,18 @@ int main() // for core 0
 }
 
 
-void core0_btstack_timer(struct btstack_timer_source *timer)
+void core0_btstack_timer(btstack_timer_source_t *timer)
 {
+    // TODO process console commands
+    // TODO process core1 commands
     static bool on = false;
     if(on)
     {
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
-        printf("ON\n");
     }
     else
     {
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
-        printf("OFF\n");
     }
     on = !on;
     btstack_run_loop_set_timer(timer, CORE0_MAIN_TIMER_INTERVAL);

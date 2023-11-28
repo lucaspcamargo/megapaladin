@@ -1,10 +1,10 @@
 # TODO 
 
-+ [ ] port to pico sdk, removing wifi
-+ [ ] stop using fifo, start using queue for processor communication
-+ [ ] move output control to core 1 completely
-+ [ ] add power led pwm and state machine
-+ [ ] enable bluetooth via btstack
++ [X] port to pico sdk, removing wifi
++ [X] use multiprocess module for processor communication
++ [X] move output control to core 1 completely
++ [X] add power led pwm and state machine
++ [X] enable bluetooth via btstack
 + [ ] create PIO peripheral for watching controller and detecting presence
 + [ ] create PIO peripheral for simulating 3-button controller
 + [ ] create PIO peripheral for simulating 6-button controller
