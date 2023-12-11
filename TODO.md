@@ -1,5 +1,6 @@
 # TODO 
 
++ [ ] updated bluepad32 from develop, make it compile again
 + [ ] figure out why Switch Pro controller crashes bluepad32!!!
 + [ ] figure out why mouse events stop coming after a while...
 

@@ -12,11 +12,7 @@
 #include <btstack_run_loop.h>
 #include <pico/cyw43_arch.h>
 #include "sdkconfig.h"
-#include "uni_init.h"
-#include "uni_log.h"
-#include "uni_platform.h"
-#include "uni_bt.h"
-#include "bt_platform.h"
+#include "uni.h"
 #ifndef CONFIG_BLUEPAD32_PLATFORM_CUSTOM
 #error "Pico W must use BLUEPAD32_PLATFORM_CUSTOM"
 #endif
