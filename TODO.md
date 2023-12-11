@@ -5,6 +5,7 @@
 + [X] move output control to core 1 completely
 + [X] add power led pwm and state machine
 + [X] enable bluetooth via btstack
++ [ ] chenge core communications to queue_t
 + [ ] create PIO peripheral for watching controller and detecting presence
 + [ ] create PIO peripheral for simulating 3-button controller
 + [ ] create PIO peripheral for simulating 6-button controller

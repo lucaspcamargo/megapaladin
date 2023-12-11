@@ -3,14 +3,17 @@
 #include <pico/types.h>
 
 #define MP_VERSION 1
+#define MP_REVISION 999
 
 // CONFIGS
 #define IS_PICO_W (PICO_BOARD == "pico_w")
 #define DEFAULT_REGION REGION_US
 #define CMD_BUF_SZ 64
-#define CORE0_MAIN_TIMER_INTERVAL 1000
+#define CORE0_MAIN_TIMER_INTERVAL 50  // TODO define value. seems to be in millisseconds
 
 #define BUTTON_DEBOUNCE_US 50000        // 0.05s
+#define BUTTON_LONGPRESS_US 400000        // 0.4s
+#define BUTTON_SYNCPRESS_US 2500000        // 2.5 s
 #define BLINK_DURATION_US 50000         // 0.05s
 #define BLINK_INTERVAL_US 100000        // 0.1s
 #define SERIAL_INIT_TIMEOUT_US 1000000  // 1s

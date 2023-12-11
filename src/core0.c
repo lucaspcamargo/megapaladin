@@ -15,6 +15,7 @@
 #include "uni_init.h"
 #include "uni_log.h"
 #include "uni_platform.h"
+#include "uni_bt.h"
 #include "bt_platform.h"
 #ifndef CONFIG_BLUEPAD32_PLATFORM_CUSTOM
 #error "Pico W must use BLUEPAD32_PLATFORM_CUSTOM"
@@ -36,9 +37,17 @@ void core1_main();
 
 int main() // for core 0
 {
+    core1_preinit();
+    fifo_init();
     // as soon as possible, get code in core 1 running (control)
+    if(!flash_safe_execute_core_init())
+    {
+        stdio_init_all();
+        printf("Failed to intialize flash access control. Program halted.\n");
+        for(;;)
+            tight_loop_contents();
+    }
     multicore_launch_core1(core1_main);
-    flash_safe_execute_core_init();
     
     // now setup core 0
     cmd_buf_len = 0;
@@ -58,21 +67,13 @@ int main() // for core 0
     if(bt_error)
         return -1;
 
-    // Turn-on LED. Turn it off once init is done.
-    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
-    sleep_ms(500);
-    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
-    sleep_ms(500);
-    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
-    sleep_ms(500);
-
     // Must be called before uni_init()
     uni_platform_set_custom(bt_platform_get());
 
     // Initialize BP32
     uni_init(0, NULL);
 
-    // add application process in run loop as a timer
+    // add application callback to run loop
     memset(&main_timer, 0x00, sizeof(btstack_timer_source_t));
     main_timer.process = &core0_btstack_timer;
     btstack_run_loop_set_timer(&main_timer, CORE0_MAIN_TIMER_INTERVAL);
@@ -87,8 +88,50 @@ int main() // for core 0
 
 void core0_btstack_timer(btstack_timer_source_t *timer)
 {
-    // TODO process console commands
-    // TODO process core1 commands
+    // NOTE: whatever can be sent to core1 straight from bt_platform, we do it there for the lowest latency
+    static bool initial_prompt = false;
+    if(!initial_prompt)
+    {
+        putchar('>');
+        putchar(' ');
+        initial_prompt = true;
+    }
+
+    // process console commands
+    int c;
+    while((c = getchar_timeout_us(0)) != PICO_ERROR_TIMEOUT)
+    {
+        if(c == '\r' || c == '\n')
+        {
+            putchar('\r');
+            putchar('\n');
+            if(cmd_buf_len)
+            {
+                cmd_buf[cmd_buf_len] = '\0';
+                core0_process_serial_cmd();
+            }
+            putchar('>');
+            putchar(' ');
+            cmd_buf_len = 0;
+        }
+        else if(cmd_buf_len == (CMD_BUF_SZ-1))
+        {
+            cmd_buf_len = 0;
+        }
+        else if(c > 0 && c < 256)
+        {
+            cmd_buf[cmd_buf_len] = (char) c;
+            putchar((char)c);
+            cmd_buf_len++;
+        }
+    }
+
+    // process core1 commands
+    FIFOCmd core1_cmd;
+    while (fifo_pop(&core1_cmd))
+        core0_process_core1_cmd(core1_cmd);
+
+    // blink 
     static bool on = false;
     if(on)
     {
@@ -99,6 +142,8 @@ void core0_btstack_timer(btstack_timer_source_t *timer)
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
     }
     on = !on;
+
+    // reschedule
     btstack_run_loop_set_timer(timer, CORE0_MAIN_TIMER_INTERVAL);
     btstack_run_loop_add_timer(timer);
 }
@@ -110,6 +155,24 @@ void core0_process_core1_cmd(const FIFOCmd repl)
     case FC_STATUS_REPL:
         core0_status_print((enum Region)repl.data[0],(enum Region)repl.data[1]);
         break;
+    case FC_SYNC_START_REQ:
+    {
+        uni_bt_enable_new_connections_safe(true);
+        FIFOCmd reply;
+        reply.opcode = FC_SYNC_STATUS_REPL;
+        reply.data[0] = 1;  // 1 means syncing
+        fifo_push(&reply);
+        break;
+    }
+    case FC_SYNC_STOP_REQ:
+    {
+        uni_bt_enable_new_connections_safe(false);
+        FIFOCmd reply;
+        reply.opcode = FC_SYNC_STATUS_REPL;
+        reply.data[0] = 0;  // 1 means not syncing
+        fifo_push(&reply);
+        break;
+    }
     default:
         printf("Core 0: unknown opcode from core 1: %d\n", (int)repl.opcode);
     }
@@ -120,43 +183,43 @@ void core0_process_serial_cmd()
     if (!strcmp(cmd_buf, "status"))
     {
         FIFOCmd c = {FC_STATUS_REQ, 0, 0, 0};
-        multicore_fifo_push_blocking(fifo_pack(&c));
+        fifo_push(&c);
     }
     else if (!strcmp(cmd_buf, "reset"))
     {
         FIFOCmd c = {FC_RESET, 0, 0, 0};
-        multicore_fifo_push_blocking(fifo_pack(&c));
+        fifo_push(&c);
         printf("Applied region, and resetted console.\n");
     }
     else if (!strcmp(cmd_buf, "us"))
     {
         FIFOCmd c = {FC_REGION_SELECT, REGION_US, 0, 0};
-        multicore_fifo_push_blocking(fifo_pack(&c));
+        fifo_push(&c);
         printf("Selected US region\n");
     }
     else if (!strcmp(cmd_buf, "eu"))
     {
         FIFOCmd c = {FC_REGION_SELECT, REGION_EU, 0, 0};
-        multicore_fifo_push_blocking(fifo_pack(&c));
+        fifo_push(&c);
         printf("Selected EU region\n");
     }
     else if (!strcmp(cmd_buf, "jp"))
     {
         FIFOCmd c = {FC_REGION_SELECT, REGION_JP, 0, 0};
-        multicore_fifo_push_blocking(fifo_pack(&c));
+        fifo_push(&c);
         printf("Selected JP region\n");
     }
     else if (!strcmp(cmd_buf, "reboot"))
     {
         printf("Rebooting the megaPALadin and the console.\n");
         FIFOCmd c = {FC_REGION_SELECT, DEFAULT_REGION, 0, 0};
-        multicore_fifo_push_blocking(fifo_pack(&c));
+        fifo_push(&c);
         c.opcode = FC_RESET;
         c.data[0] = 0;
-        multicore_fifo_push_blocking(fifo_pack(&c));
-        // wait for core 1 to reset, add some safety margin
+        fifo_push(&c);
+        // wait for core 1 to reset, with some safety margin
         sleep_ms(RESET_DURATION_MS + (RESET_DURATION_MS/4));
-        reboot();
+        reboot();   // TODO this is panicking
     }
     else if ((!strcmp(cmd_buf, "help")) || (!strcmp(cmd_buf, "?")))
     {
@@ -170,10 +233,13 @@ void core0_process_serial_cmd()
 
 void core0_status_print(enum Region curr_region, enum Region sel_region)
 {
-    printf("\nmegaPALadin V%d\n", MP_VERSION);
+    printf("\nmegaPALadin V%d rev. %d\n", MP_VERSION, MP_REVISION);
     printf("Current region: %s\n", region_str(curr_region));
     printf("Selected region: %s\n", region_str(sel_region));
     struct mallinfo mi = mallinfo();
     printf("Heap mem: ", mi.fordblks," free, ", mi.arena, " total");
     printf("Core temperature: %2.1fC\n", temp_read());
+    printf("Device dump:\n");
+    uni_bt_dump_devices_safe();
+    printf("\n> ");
 }

@@ -54,7 +54,7 @@ static void bt_platform_on_init_complete(void) {
     // Safe to call "unsafe" functions since they are called from BT thread
 
     // Start scanning
-    uni_bt_enable_new_connections_unsafe(true);
+    uni_bt_enable_new_connections_unsafe(false);
 
     // Based on runtime condition you can delete or list the stored BT keys.
     if (1)

@@ -1,6 +1,25 @@
 #include "support.h"
 
 #include <hardware/adc.h>
+#include <pico/util/queue.h>
+
+static queue_t q_120, q_021;
+
+void fifo_init()
+{
+    queue_init(&q_120, sizeof(FIFOCmd), 8);
+    queue_init(&q_021, sizeof(FIFOCmd), 8);
+}
+
+bool fifo_push(FIFOCmd *incmd)
+{
+    return queue_try_add(get_core_num()?&q_120:&q_021, incmd);
+}
+
+bool fifo_pop(FIFOCmd *incmd)
+{
+    return queue_try_remove(get_core_num()?&q_021:&q_120, incmd);
+}
 
 const char *region_str(enum Region r)
 {

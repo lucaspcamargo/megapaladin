@@ -59,7 +59,7 @@ uint64_t btn_last_press_duration()
 
 uint64_t btn_curr_press_duration( uint64_t now )
 {
-    return btn_is_pressed()? m_lastPress - now : 0;
+    return btn_is_pressed()? now - m_lastPress : 0;
 }
 
 bool btn_was_released()

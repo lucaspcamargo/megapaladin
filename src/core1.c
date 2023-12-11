@@ -20,6 +20,7 @@ enum PwrLEDState
     PLS_DRONING
 } __attribute__((packed));
 
+bool syncing_now = false;
 enum Region region_curr = DEFAULT_REGION;
 enum Region region_sel = DEFAULT_REGION;
 enum PwrLEDState pwrled_state;
@@ -35,6 +36,8 @@ void core1_region_advance();
 void core1_do_reset();
 void core1_pwrled_update();
 void core1_pwrled_blink(uint times);
+void core1_pwrled_drone();
+void core1_pwrled_steady();
 
 
 void core1_main()
@@ -91,24 +94,36 @@ void core1_loop()
 {
     // handle reset button
     unsigned long now = time_us_64();
+    static bool press_sync_sent = false;
     btn_update(now);
     if (btn_was_released())
     {
-        unsigned long pressedTime = btn_last_press_duration();
-        if (pressedTime < 400000)
-            core1_do_reset();
+        if(press_sync_sent)
+        {
+            press_sync_sent = false;
+        }
         else
-            core1_region_advance();
-
-        // TODO on release, clear sync sent during press flag
+        {
+            unsigned long pressedTime = btn_last_press_duration();
+            if (pressedTime < BUTTON_LONGPRESS_US)
+                core1_do_reset();
+            else
+                core1_region_advance();
+        }
     }
-    // TODO else if(btn_is_pressed() && btn is held for more than threshold && ! sync sent during press)
-    //               send_bt_sync_command();
+    else if(btn_is_pressed() && btn_curr_press_duration(now) > BUTTON_SYNCPRESS_US && !press_sync_sent)
+    {
+        // sync request
+        FIFOCmd req;
+        req.opcode = syncing_now? FC_SYNC_STOP_REQ : FC_SYNC_START_REQ;
+        fifo_push(&req);
+        press_sync_sent = true;
+    }
 
     core1_pwrled_update();
 
     FIFOCmd core0_cmd;
-    while (multicore_fifo_pop_timeout_us(FIFO_TIMEOUT_US, (uint32_t *)&core0_cmd))
+    while (fifo_pop(&core0_cmd))
     {
         switch (core0_cmd.opcode)
         {
@@ -119,7 +134,13 @@ void core1_loop()
             reply.data[0] = region_curr;
             reply.data[1] = region_sel;
             reply.data[2] = 0;
-            multicore_fifo_push_blocking(fifo_pack(&reply));
+            fifo_push(&reply);
+        }
+        break;
+        case FC_SYNC_STATUS_REPL:
+        {
+            syncing_now = core0_cmd.data[0] ? true : false;
+            (syncing_now? core1_pwrled_drone : core1_pwrled_steady)();
         }
         break;
         case FC_REGION_SELECT:
@@ -214,5 +235,19 @@ void core1_pwrled_blink(uint times)
 {
     pwrled_state = PLS_BLINKING;
     pwrled_state_data = times;
+    pwrled_state_timer = time_us_64();
+}
+
+void core1_pwrled_drone()
+{
+    pwrled_state = PLS_DRONING;
+    pwrled_state_data = 0;
+    pwrled_state_timer = time_us_64();
+}
+
+void core1_pwrled_steady()
+{
+    pwrled_state = PLS_STEADY;
+    pwrled_state_data = 0;
     pwrled_state_timer = time_us_64();
 }

@@ -3,10 +3,11 @@
 #include "./defs.h"
 #include <pico/malloc.h>
 
-const char *region_str(enum Region r);
+void fifo_init();
+bool fifo_push(FIFOCmd *incmd);
+bool fifo_pop(FIFOCmd *incmd);
 
-inline uint32_t fifo_pack(FIFOCmd *c) { return *((uint32_t*)c); }
-inline void fifo_unpack(FIFOCmd *c, uint32_t in_val) { *c = *((FIFOCmd*)&in_val); }
+const char *region_str(enum Region r);
 
 void temp_init();
 float temp_read();
