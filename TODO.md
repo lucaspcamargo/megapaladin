@@ -1,5 +1,8 @@
 # TODO 
 
++ [ ] figure out why Switch Pro controller crashes bluepad32!!!
++ [ ] figure out why mouse events stop coming after a while...
+
 + [X] port to pico sdk, removing wifi
 + [X] use multiprocess module for processor communication
 + [X] move output control to core 1 completely

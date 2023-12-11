@@ -21,6 +21,7 @@ enum PwrLEDState
 } __attribute__((packed));
 
 bool syncing_now = false;
+bool press_sync_sent = false;
 enum Region region_curr = DEFAULT_REGION;
 enum Region region_sel = DEFAULT_REGION;
 enum PwrLEDState pwrled_state;
@@ -94,7 +95,6 @@ void core1_loop()
 {
     // handle reset button
     unsigned long now = time_us_64();
-    static bool press_sync_sent = false;
     btn_update(now);
     if (btn_was_released())
     {
@@ -210,9 +210,9 @@ void core1_pwrled_update()
         uint64_t max_delta = blink_period * pwrled_state_data;
         if(delta > max_delta)
         {
-            pwrled_state = PLS_STEADY;
+            pwrled_state = syncing_now? PLS_DRONING : PLS_STEADY;
             pwrled_state_data = 0;
-            pwrled_state_timer = 0;
+            pwrled_state_timer = now;
         }
         else
         {
