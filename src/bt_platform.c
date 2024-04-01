@@ -14,6 +14,16 @@
 #error "Pico W must use BLUEPAD32_PLATFORM_CUSTOM"
 #endif
 
+
+enum {
+    TRIGGER_EFFECT_VIBRATION,
+    TRIGGER_EFFECT_WEAPON,
+    TRIGGER_EFFECT_FEEDBACK,
+    TRIGGER_EFFECT_OFF,
+
+    TRIGGER_EFFECT_COUNT,
+};
+
 // Declarations
 static void trigger_event_on_gamepad(uni_hid_device_t* d);
 
@@ -60,6 +70,8 @@ static void bt_platform_on_init_complete(void) {
 
     // Turn off LED once init is done.
     cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
+
+    uni_property_list_all();
 }
 
 static void bt_platform_on_device_connected(uni_hid_device_t* d) {
@@ -142,7 +154,7 @@ static void bt_platform_on_controller_data(uni_hid_device_t* d, uni_controller_t
     }
 }
 
-static int32_t bt_platform_get_property(uni_platform_property_t key) {
+static int32_t bt_platform_get_property(uni_property_idx_t key) {
     // Deprecated
     ARG_UNUSED(key);
     return 0;
