@@ -8,6 +8,8 @@
 
 #include "sdkconfig.h"
 #include "uni.h"
+#include "defs.h"
+#include "support.h"
 
 // Sanity check
 #ifndef CONFIG_BLUEPAD32_PLATFORM_CUSTOM
@@ -15,102 +17,37 @@
 #endif
 
 
+
+// Defines
 enum {
     TRIGGER_EFFECT_VIBRATION,
     TRIGGER_EFFECT_WEAPON,
     TRIGGER_EFFECT_FEEDBACK,
     TRIGGER_EFFECT_OFF,
-
     TRIGGER_EFFECT_COUNT,
 };
 
-// Declarations
-static void trigger_event_on_gamepad(uni_hid_device_t* d);
 
-//
-// Platform Overrides
-//
-static void bt_platform_init(int argc, const char** argv) {
-    ARG_UNUSED(argc);
-    ARG_UNUSED(argv);
 
-    logi("bt_platform: init()\n");
+// Data
+static uint8_t bp_device_count;
+static uni_hid_device_t *bp_devices[JOY_MAX];
+static uint8_t bp_device_types[JOY_MAX];
 
-#if 0
-    uni_gamepad_mappings_t mappings = GAMEPAD_DEFAULT_MAPPINGS;
 
-    // Inverted axis with inverted Y in RY.
-    mappings.axis_x = UNI_GAMEPAD_MAPPINGS_AXIS_RX;
-    mappings.axis_y = UNI_GAMEPAD_MAPPINGS_AXIS_RY;
-    mappings.axis_ry_inverted = true;
-    mappings.axis_rx = UNI_GAMEPAD_MAPPINGS_AXIS_X;
-    mappings.axis_ry = UNI_GAMEPAD_MAPPINGS_AXIS_Y;
 
-    // Invert A & B
-    mappings.button_a = UNI_GAMEPAD_MAPPINGS_BUTTON_B;
-    mappings.button_b = UNI_GAMEPAD_MAPPINGS_BUTTON_A;
-
-    uni_gamepad_set_mappings(&mappings);
-#endif
-}
-
-static void bt_platform_on_init_complete(void) {
-    logi("bt_platform: on_init_complete()\n");
-
-    // Safe to call "unsafe" functions since they are called from BT thread
-
-    // Start scanning
-    uni_bt_enable_new_connections_unsafe(false);
-
-    // Based on runtime condition you can delete or list the stored BT keys.
-    if (1)
-        uni_bt_del_keys_unsafe();
-    else
-        uni_bt_list_keys_unsafe();
-
-    // Turn off LED once init is done.
-    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
-
-    uni_property_list_all();
-}
-
-static void bt_platform_on_device_connected(uni_hid_device_t* d) {
-    logi("bt_platform: device connected: %p\n", d);
-}
-
-static void bt_platform_on_device_disconnected(uni_hid_device_t* d) {
-    logi("bt_platform: device disconnected: %p\n", d);
-}
-
-static uni_error_t bt_platform_on_device_ready(uni_hid_device_t* d) {
-    logi("bt_platform: device ready: %p\n", d);
-
-    // You can reject the connection by returning an error.
-    return UNI_ERROR_SUCCESS;
-}
-
-static void bt_platform_on_controller_data(uni_hid_device_t* d, uni_controller_t* ctl) {
-    static uint8_t leds = 0;
-    static uint8_t enabled = true;
-    static uni_controller_t prev = {0};
-    uni_gamepad_t* gp;
-
-    if (memcmp(&prev, ctl, sizeof(*ctl)) == 0) {
-        return;
-    }
-    prev = *ctl;
-    // Print device Id before dumping gamepad.
-    logi("(%p) ", d);
-    uni_controller_dump(ctl);
-
-    switch (ctl->klass) {
-        case UNI_CONTROLLER_CLASS_GAMEPAD:
-            gp = &ctl->gamepad;
-
+// Helpers
+static void _bp_trigger_event_on_gamepad(uni_hid_device_t* d);
+static void _bp_device_debug_on_controller_data()
+{
+    /*
             // Debugging
             // Axis ry: control rumble
-            if ((gp->buttons & BUTTON_A) && d->report_parser.set_rumble != NULL) {
-                d->report_parser.set_rumble(d, 128, 128);
+            if ((gp->buttons & BUTTON_A) && d->report_parser.play_dual_rumble != NULL) {
+                d->report_parser.play_dual_rumble(d, 0, // delayed start ms
+                                                    250, // duration ms
+                                                    128, // weak magnitude 
+                                                    0); // strong magnitude
             }
             // Buttons: Control LEDs On/Off
             if ((gp->buttons & BUTTON_B) && d->report_parser.set_player_leds != NULL) {
@@ -135,7 +72,179 @@ static void bt_platform_on_controller_data(uni_hid_device_t* d, uni_controller_t
                 uni_bt_enable_new_connections_safe(true);
                 enabled = true;
             }
+            */
+}
+
+static void _bp_create_remappings()
+{
+    uni_gamepad_mappings_t mappings = GAMEPAD_DEFAULT_MAPPINGS;
+
+    // Inverted axis with inverted Y in RY.
+    mappings.axis_x = UNI_GAMEPAD_MAPPINGS_AXIS_RX;
+    mappings.axis_y = UNI_GAMEPAD_MAPPINGS_AXIS_RY;
+    mappings.axis_ry_inverted = true;
+    mappings.axis_rx = UNI_GAMEPAD_MAPPINGS_AXIS_X;
+    mappings.axis_ry = UNI_GAMEPAD_MAPPINGS_AXIS_Y;
+
+    // Invert A & B
+    mappings.button_a = UNI_GAMEPAD_MAPPINGS_BUTTON_B;
+    mappings.button_b = UNI_GAMEPAD_MAPPINGS_BUTTON_A;
+
+    uni_gamepad_set_mappings(&mappings);
+}
+
+
+void _bp_send_host_status(enum FIFOCmdFlags flags)
+{
+    FIFOCmd cmd;
+    cmd.opcode = FC_JOY_HOST_STATUS;
+    cmd.data[0] = flags;
+    cmd.data[1] = bp_device_types[0] | bp_device_types[1] << 4;
+#if (JOY_MAX == 4)
+    cmd.data[2] = bp_device_types[2] | bp_device_types[3] << 4;
+#elif (JOY_MAX == 2)
+    cmd.data[2] = DEVICE_TYPE_NONE | DEVICE_TYPE_NONE << 4;
+#else
+#error "Weird JOY_MAX, cannot handle here"
+#endif 
+
+    fifo_push(&cmd);
+}
+
+void _bp_send_controller_data_joy(uni_hid_device_t* d, uni_controller_t* ctl) {
+    uni_gamepad_t* gp = &ctl->gamepad;
+
+    FIFOCmd cmd;
+    cmd.opcode = FC_JOY_HOST_EVENT;
+    cmd.data[0] = FC_F_JOY_EVENT_CURR;
+    // TODO data
+    fifo_push(&cmd);
+}
+
+void _bp_send_controller_data_mouse(uni_hid_device_t* d, uni_controller_t* ctl) {
+    // TODO
+}
+
+uint8_t _bp_convert_controller_class_to_native(uni_controller_class_t type)
+{
+    switch(type)
+    {
+
+    }
+    return UNI_CONTROLLER_CLASS_NONE;
+}
+
+
+//
+// Platform Overrides
+//
+static void bt_platform_init(int argc, const char** argv) {
+    ARG_UNUSED(argc);
+    ARG_UNUSED(argv);
+
+    // turn on led on init
+    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
+
+    logi("bt_platform: init()\n");
+
+    bp_device_count = 0;
+    memset(bp_devices, 0x00, sizeof(bp_devices));
+    memset(bp_device_types, 0x00, sizeof(bp_device_types));
+
+    // _bp_create_remappings();
+}
+
+static void bt_platform_on_init_complete(void) {
+    logi("bt_platform: on_init_complete()\n");
+
+    // Safe to call "unsafe" functions since they are called from BT thread
+
+    // Don't scan in the beginning scanning
+    uni_bt_enable_new_connections_unsafe(false);
+
+    // Based on runtime condition you can delete or list the stored BT keys.
+    if (1)
+        uni_bt_del_keys_unsafe();
+    else
+        uni_bt_list_keys_unsafe();
+
+    // Turn off LED once init is done.
+    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
+
+    uni_property_dump_all();
+}
+
+static void bt_platform_on_device_connected(uni_hid_device_t* d) {
+    logi("bt_platform: device connected: %p\n", d);
+
+    // we use on_device_ready to determine whether to actually keep the device
+    // so, we do nothing here for now
+}
+
+static void bt_platform_on_device_disconnected(uni_hid_device_t* d) {
+    logi("bt_platform: device disconnected: %p\n", d);
+
+    for(int i = 0; i < JOY_MAX; i++)
+        if(bp_devices[i] == d)
+        {
+            bp_devices[i] = NULL;
+            bp_device_count--;
+
+            _bp_send_host_status(FC_F_JOY_STATUS_DISCONNECTED);
+
             break;
+        }
+}
+
+static uni_error_t bt_platform_on_device_ready(uni_hid_device_t* d) {
+    logi("bt_platform: device ready: %p\n", d);
+
+
+    if(bp_device_count >= JOY_MAX)
+        return UNI_ERROR_NO_SLOTS;
+
+    if(d->controller_type == k_eControllerType_Unknown || d->controller_type == k_eControllerType_None)
+        return UNI_ERROR_INVALID_CONTROLLER;
+
+    uint8_t native_type = _bp_convert_controller_class_to_native(d->controller.klass);
+    if(native_type == DEVICE_TYPE_NONE || native_type == DEVICE_TYPE_UNKNOWN)
+        return UNI_ERROR_INVALID_CONTROLLER;
+
+    for(int i = 0; i < JOY_MAX; i++)
+        if(!bp_devices[i])
+        {
+            bp_devices[i] = d;
+            bp_device_types[i] = native_type;
+            bp_device_count++;
+
+            _bp_send_host_status(FC_F_JOY_STATUS_CONNECTED);
+
+            return UNI_ERROR_SUCCESS;
+        }
+        
+    return UNI_ERROR_NO_SLOTS;
+}
+
+static void bt_platform_on_controller_data(uni_hid_device_t* d, uni_controller_t* ctl) {
+    static uint8_t leds = 0;
+    static uint8_t enabled = true;
+    static uni_controller_t prev = {0};
+    uni_gamepad_t* gp;
+
+    if (memcmp(&prev, ctl, sizeof(*ctl)) == 0) {
+        return;
+    }
+    prev = *ctl;
+    // Print device Id before dumping gamepad.
+    logi("(%p) ", d);
+    uni_controller_dump(ctl);
+
+    switch (ctl->klass) {
+        case UNI_CONTROLLER_CLASS_GAMEPAD:
+        {
+            _bp_send_controller_data_joy(d, ctl);
+        }
+        break;
         case UNI_CONTROLLER_CLASS_BALANCE_BOARD:
             // Do something
             uni_balance_board_dump(&ctl->balance_board);
@@ -143,6 +252,7 @@ static void bt_platform_on_controller_data(uni_hid_device_t* d, uni_controller_t
         case UNI_CONTROLLER_CLASS_MOUSE:
             // Do something
             uni_mouse_dump(&ctl->mouse);
+            _bp_send_controller_data_mouse(d, ctl);
             break;
         case UNI_CONTROLLER_CLASS_KEYBOARD:
             // Do something
@@ -154,17 +264,17 @@ static void bt_platform_on_controller_data(uni_hid_device_t* d, uni_controller_t
     }
 }
 
-static int32_t bt_platform_get_property(uni_property_idx_t key) {
+static const uni_property_t* bt_platform_get_property(uni_property_idx_t key) {
     // Deprecated
     ARG_UNUSED(key);
-    return 0;
+    return NULL;
 }
 
 static void bt_platform_on_oob_event(uni_platform_oob_event_t event, void* data) {
     switch (event) {
         case UNI_PLATFORM_OOB_GAMEPAD_SYSTEM_BUTTON:
             // Optional: do something when "system" button gets pressed.
-            trigger_event_on_gamepad((uni_hid_device_t*)data);
+            _bp_trigger_event_on_gamepad((uni_hid_device_t*)data);
             break;
 
         case UNI_PLATFORM_OOB_BLUETOOTH_ENABLED:
@@ -181,9 +291,10 @@ static void bt_platform_on_oob_event(uni_platform_oob_event_t event, void* data)
 //
 // Helpers
 //
-static void trigger_event_on_gamepad(uni_hid_device_t* d) {
-    if (d->report_parser.set_rumble != NULL) {
-        d->report_parser.set_rumble(d, 0x80 /* value */, 15 /* duration */);
+static void _bp_trigger_event_on_gamepad(uni_hid_device_t* d) {
+    if (d->report_parser.play_dual_rumble != NULL) {
+        d->report_parser.play_dual_rumble(d, 0 /* delayed start ms */, 50 /* duration ms */, 128 /* weak magnitude */,
+                                          40 /* strong magnitude */);
     }
 
     if (d->report_parser.set_player_leds != NULL) {

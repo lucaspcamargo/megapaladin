@@ -1,5 +1,6 @@
 #include "defs.h"
 #include "support.h"
+#include "bt_platform.h"
 
 #include <stdio.h>
 #include <string.h>

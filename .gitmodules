@@ -7,3 +7,9 @@
 [submodule "thirdparty/picotool"]
 	path = thirdparty/picotool
 	url = https://github.com/raspberrypi/picotool.git
+[submodule "thirdparty/picoprobe"]
+	path = thirdparty/picoprobe
+	url = https://github.com/raspberrypi/picoprobe.git
+[submodule "thirdparty/openocd"]
+	path = thirdparty/openocd
+	url = https://github.com/raspberrypi/openocd.git

@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.13)
 
 set(PICO_BOARD pico_w)
-set(BLUEPAD32_ROOT thirdparty/bluepad32)
 
-include(thirdparty/pico-sdk/pico_sdk_init.cmake)
-
+set(BLUEPAD32_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/bluepad32)
 set(BTSTACK_ROOT ${BLUEPAD32_ROOT}/external/btstack) # replace built-in in pico-sdk
+set(PICO_BTSTACK_PATH ${BTSTACK_ROOT})
+
+include(thirdparty/bluepad32/examples/pico_w/pico_sdk_import.cmake)
 
 project(megapaladin VERSION 2)
 set(CMAKE_C_STANDARD 11)
@@ -29,6 +30,10 @@ target_include_directories(megapaladin PRIVATE
 # Needed for btstack_config.h / sdkconfig.h
 # so that libblupad32 can include them
 include_directories(megapaladin src)
+
+# Needed when using BTstack from our branch
+include_directories(${BTSTACK_ROOT}/3rd-party/bluedroid/encoder/include)
+include_directories(${BTSTACK_ROOT}/3rd-party/bluedroid/decoder/include)
 
 target_link_libraries(megapaladin 
     pico_stdlib
