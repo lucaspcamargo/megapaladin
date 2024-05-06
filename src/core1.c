@@ -1,12 +1,14 @@
 #include "defs.h"
 #include "button.h"
 #include "support.h"
+#include "ports.h"
 
 #include <pico/stdlib.h>
 #include <pico/multicore.h>
 #include <pico/flash.h>
 #include <hardware/gpio.h>
 #include <hardware/pwm.h>
+
 
 const unsigned char region_mapping[][2] = {
     {LANG_EN, FMT_NTSC}, // REGION_US
@@ -58,6 +60,8 @@ void core1_preinit()
     gpio_init(PIN_OUT_LANG);
     gpio_set_dir(PIN_OUT_LANG, GPIO_OUT);
     core1_region_commit();
+
+    port_init();
 }
 
 void core1_init()
@@ -158,8 +162,29 @@ void core1_loop()
             core1_do_reset();
         }
         break;
+        case FC_JOY_HOST_STATUS:
+        {
+            for(int port = 0; port < PORT_COUNT; port++)
+            {
+                uint8_t bt_type = core0_cmd.data[1+port/2] & (0xf << port%2);
+                uint8_t curr_type = port_type_curr(port);
+                if(bt_type != curr_type)
+                {
+                    port_type_set(port, bt_type);
+                }
+            }
+        }
+        break;
+        case FC_JOY_HOST_EVENT:
+        {
+
+            port_on_host_event(&core0_cmd);
+        }
+        break;
         }
     }
+
+    port_step();
 }
 
 void core1_region_commit()

@@ -86,6 +86,7 @@ enum FIFOCmdFlags
   // 22221111 44443333
 
   // for FC_JOY_HOST_EVENT
+  // byte 0 carries flags and the controller index: IIIIFFFF
   FC_F_JOY_EVENT_CURR = 0x01,
   // bytes 1 and 2 carry controller or mouse data
   // joypad: SACBRLDU ----MXYZ
@@ -94,25 +95,25 @@ enum FIFOCmdFlags
 
 // Device types
 #define DEVICE_TYPE_NONE      0x00
-#define DEVICE_TYPE_JOY       0x01
+#define DEVICE_TYPE_JOY       0x01  
 #define DEVICE_TYPE_MOUSE     0x02
 #define DEVICE_TYPE_UNKNOWN   0x0F
 
 
 // Button bits
 // WE USE SGDK STANDARD AROUND THESE PARTS
-#define BUTTON_UP       0x0001
-#define BUTTON_DOWN     0x0002
-#define BUTTON_LEFT     0x0004
-#define BUTTON_RIGHT    0x0008
-#define BUTTON_A        0x0040
-#define BUTTON_B        0x0010
-#define BUTTON_C        0x0020
-#define BUTTON_START    0x0080
-#define BUTTON_X        0x0400
-#define BUTTON_Y        0x0200
-#define BUTTON_Z        0x0100
-#define BUTTON_MODE     0x0800
-#define BUTTON_LMB      0x0040  // is A
-#define BUTTON_MMB      0x0010  // is B
-#define BUTTON_RMB      0x0020  // is C 
+#define BIT_BTN_UP       0x0001
+#define BIT_BTN_DOWN     0x0002
+#define BIT_BTN_LEFT     0x0004
+#define BIT_BTN_RIGHT    0x0008
+#define BIT_BTN_A        0x0040
+#define BIT_BTN_B        0x0010
+#define BIT_BTN_C        0x0020
+#define BIT_BTN_START    0x0080
+#define BIT_BTN_X        0x0400
+#define BIT_BTN_Y        0x0200
+#define BIT_BTN_Z        0x0100
+#define BIT_BTN_MODE     0x0800
+#define BIT_BTN_LMB      0x0040  // is A
+#define BIT_BTN_MMB      0x0010  // is B
+#define BIT_BTN_RMB      0x0020  // is C 

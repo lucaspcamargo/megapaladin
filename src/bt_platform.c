@@ -111,27 +111,42 @@ void _bp_send_host_status(enum FIFOCmdFlags flags)
     fifo_push(&cmd);
 }
 
-void _bp_send_controller_data_joy(uni_hid_device_t* d, uni_controller_t* ctl) {
+void _bp_send_controller_data_joy(uni_hid_device_t* d, uni_controller_t* ctl, uint8_t idx) {
     uni_gamepad_t* gp = &ctl->gamepad;
 
     FIFOCmd cmd;
     cmd.opcode = FC_JOY_HOST_EVENT;
-    cmd.data[0] = FC_F_JOY_EVENT_CURR;
+    cmd.data[0] = FC_F_JOY_EVENT_CURR | ((idx & 0xf) << 4);
     // TODO data
     fifo_push(&cmd);
 }
 
 void _bp_send_controller_data_mouse(uni_hid_device_t* d, uni_controller_t* ctl) {
-    // TODO
+    uni_mouse_t* m = &ctl->mouse;
 }
 
 uint8_t _bp_convert_controller_class_to_native(uni_controller_class_t type)
 {
     switch(type)
     {
-
+        case UNI_CONTROLLER_CLASS_NONE:
+            return DEVICE_TYPE_NONE;
+        case UNI_CONTROLLER_CLASS_GAMEPAD:
+            return DEVICE_TYPE_JOY;
+        case UNI_CONTROLLER_CLASS_MOUSE:
+            return DEVICE_TYPE_MOUSE;
+        default:
+            break;
     }
-    return UNI_CONTROLLER_CLASS_NONE;
+    return DEVICE_TYPE_UNKNOWN;
+}
+
+uint8_t _bp_get_index(uni_hid_device_t* d)
+{
+    for(int i = 0; i < JOY_MAX; i++)
+        if(bp_devices[i] == d)
+            return i;
+    return 0xff;
 }
 
 
@@ -242,7 +257,9 @@ static void bt_platform_on_controller_data(uni_hid_device_t* d, uni_controller_t
     switch (ctl->klass) {
         case UNI_CONTROLLER_CLASS_GAMEPAD:
         {
-            _bp_send_controller_data_joy(d, ctl);
+            uint8_t idx = _bp_get_index(d);
+            if(idx != 0xff)
+                _bp_send_controller_data_joy(d, ctl, idx);
         }
         break;
         case UNI_CONTROLLER_CLASS_BALANCE_BOARD:

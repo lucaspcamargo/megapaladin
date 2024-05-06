@@ -20,6 +20,7 @@ add_executable(megapaladin
     src/support.c
     src/button.c
     src/bt_platform.c
+    src/ports.c
 )
 
 
