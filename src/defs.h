@@ -90,7 +90,7 @@ enum FIFOCmdFlags
   FC_F_JOY_EVENT_CURR = 0x01,
   // bytes 1 and 2 carry controller or mouse data
   // joypad: SACBRLDU ----MXYZ
-  // mouse:  SACBM--- XXXXYYYY, LMB=A RMB=C MMB=B
+  // mouse:  SACBYYYY YYXXXXXX, LMB=A RMB=C MMB=B, numbers have a sign bit, no complement, minus zero means overflow  
 } __attribute__ ((packed));
 
 // Device types

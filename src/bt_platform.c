@@ -93,6 +93,13 @@ static void _bp_create_remappings()
     uni_gamepad_set_mappings(&mappings);
 }
 
+uint8_t _bp_get_index(uni_hid_device_t* d)
+{
+    for(int i = 0; i < JOY_MAX; i++)
+        if(bp_devices[i] == d)
+            return i;
+    return 0xff;
+}
 
 void _bp_send_host_status(enum FIFOCmdFlags flags)
 {
@@ -117,12 +124,67 @@ void _bp_send_controller_data_joy(uni_hid_device_t* d, uni_controller_t* ctl, ui
     FIFOCmd cmd;
     cmd.opcode = FC_JOY_HOST_EVENT;
     cmd.data[0] = FC_F_JOY_EVENT_CURR | ((idx & 0xf) << 4);
-    // TODO data
+    uint16_t bits = 0;
+    if(gp->buttons & BUTTON_X)
+        bits |= BIT_BTN_A;
+    if(gp->buttons & BUTTON_A)
+        bits |= BIT_BTN_B;
+    if(gp->buttons & BUTTON_B)
+        bits |= BIT_BTN_C;
+    if(gp->buttons & BUTTON_Y)
+        bits |= BIT_BTN_X;
+    if(gp->buttons & BUTTON_SHOULDER_L)
+        bits |= BIT_BTN_Y;
+    if(gp->buttons & BUTTON_SHOULDER_R)
+        bits |= BIT_BTN_Z;
+    if(gp->misc_buttons & (MISC_BUTTON_SELECT|MISC_BUTTON_BACK))
+        bits |= BIT_BTN_MODE;
+    if(gp->misc_buttons & MISC_BUTTON_START)
+        bits |= BIT_BTN_START;
+    if(gp->axis_x < 200)
+        bits |= BIT_BTN_LEFT;
+    else if(gp->axis_x > 200)
+        bits |= BIT_BTN_RIGHT;
+    if(gp->axis_y < 200)
+        bits |= BIT_BTN_UP;
+    else if(gp->axis_y > 200)
+        bits |= BIT_BTN_DOWN;
+    cmd.data[1] = bits & 0xf;
+    cmd.data[2] = bits>>4 & 0xf;
     fifo_push(&cmd);
 }
 
-void _bp_send_controller_data_mouse(uni_hid_device_t* d, uni_controller_t* ctl) {
+void _bp_send_controller_data_mouse(uni_hid_device_t* d, uni_controller_t* ctl, uint8_t idx) {
     uni_mouse_t* m = &ctl->mouse;
+
+    FIFOCmd cmd;
+    cmd.opcode = FC_JOY_HOST_EVENT;
+    cmd.data[0] = FC_F_JOY_EVENT_CURR | ((idx & 0xf) << 4);
+    cmd.data[1] = cmd.data[2] = 0;
+    uint16_t bits = 0;
+    if(m->buttons & UNI_MOUSE_BUTTON_LEFT)
+        bits |= BIT_BTN_LMB;
+    if(m->buttons & UNI_MOUSE_BUTTON_MIDDLE)
+        bits |= BIT_BTN_MMB;
+    if(m->buttons & UNI_MOUSE_BUTTON_RIGHT)
+        bits |= BIT_BTN_RMB;
+    if(m->buttons & UNI_MOUSE_BUTTON_AUX_0)
+        bits |= BIT_BTN_START;
+
+    // TODO apply divisor and accumulator here
+
+    int32_t delta_x = m->delta_x, delta_y = m->delta_y;
+    delta_x = MIN(MAX(delta_x, -31), 31);  // clip instead of reporting overflow, because mice are really precise these days
+    delta_y = MIN(MAX(delta_y, -31), 31);
+    
+    bool x_neg = delta_x < 0;
+    bool y_neg = delta_y < 0;
+    delta_x = abs(delta_x);  // clip instead of reporting overflow, because mice are really precise these days
+    delta_y = abs(delta_y);
+
+    cmd.data[1] = (bits & 0xf0) | (y_neg? 0b1000 : 0) | (delta_y >> 2);
+    cmd.data[2] = (delta_y<<6 & 0xff) | (x_neg? 0b100000 : 0) | (delta_x & 0b11111);
+    fifo_push(&cmd);
 }
 
 uint8_t _bp_convert_controller_class_to_native(uni_controller_class_t type)
@@ -141,13 +203,6 @@ uint8_t _bp_convert_controller_class_to_native(uni_controller_class_t type)
     return DEVICE_TYPE_UNKNOWN;
 }
 
-uint8_t _bp_get_index(uni_hid_device_t* d)
-{
-    for(int i = 0; i < JOY_MAX; i++)
-        if(bp_devices[i] == d)
-            return i;
-    return 0xff;
-}
 
 
 //
@@ -252,7 +307,6 @@ static void bt_platform_on_controller_data(uni_hid_device_t* d, uni_controller_t
     prev = *ctl;
     // Print device Id before dumping gamepad.
     logi("(%p) ", d);
-    uni_controller_dump(ctl);
 
     switch (ctl->klass) {
         case UNI_CONTROLLER_CLASS_GAMEPAD:
@@ -260,6 +314,7 @@ static void bt_platform_on_controller_data(uni_hid_device_t* d, uni_controller_t
             uint8_t idx = _bp_get_index(d);
             if(idx != 0xff)
                 _bp_send_controller_data_joy(d, ctl, idx);
+            uni_controller_dump(ctl);
         }
         break;
         case UNI_CONTROLLER_CLASS_BALANCE_BOARD:
@@ -267,9 +322,11 @@ static void bt_platform_on_controller_data(uni_hid_device_t* d, uni_controller_t
             uni_balance_board_dump(&ctl->balance_board);
             break;
         case UNI_CONTROLLER_CLASS_MOUSE:
-            // Do something
+            uint8_t idx = _bp_get_index(d);
+            if(idx != 0xff)
+                _bp_send_controller_data_mouse(d, ctl, idx);
+            uni_controller_dump(ctl);
             uni_mouse_dump(&ctl->mouse);
-            _bp_send_controller_data_mouse(d, ctl);
             break;
         case UNI_CONTROLLER_CLASS_KEYBOARD:
             // Do something
