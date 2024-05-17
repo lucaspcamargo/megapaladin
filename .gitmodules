@@ -13,3 +13,6 @@
 [submodule "thirdparty/openocd"]
 	path = thirdparty/openocd
 	url = https://github.com/raspberrypi/openocd.git
+[submodule "thirdparty/ki-lime-pi-pico"]
+	path = thirdparty/ki-lime-pi-pico
+	url = https://github.com/recursivenomad/ki-lime-pi-pico.git

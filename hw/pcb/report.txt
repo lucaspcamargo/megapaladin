@@ -1,0 +1,89 @@
+Informação: Processando o símbolo 'R26:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R11:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R12:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R13:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R14:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R15:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R16:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R17:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R18:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R19:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R20:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R21:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'D1:Diode_SMD:D_SOD-123F'.
+Informação: Processando o símbolo 'R23:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R24:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R25:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R22:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R27:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R28:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R29:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R30:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R31:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R32:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R33:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R34:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'U1:Module_RaspberryPi_Pico:RaspberryPi_Pico_W_SMD_MountingHoles_Castellated_HandSolder'.
+Informação: Processando o símbolo 'U2:footprints:cheap_lvl_shifter_4ch'.
+Informação: Processando o símbolo 'U3:footprints:cheap_lvl_shifter_4ch'.
+Informação: Processando o símbolo 'U4:footprints:cheap_lvl_shifter_4ch'.
+Informação: Processando o símbolo 'U5:footprints:cheap_lvl_shifter_4ch'.
+Informação: Processando o símbolo 'U6:footprints:cheap_lvl_shifter_4ch'.
+Informação: Processando o símbolo 'R9:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'D2:LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'D3:LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'D4:LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'D5:LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'D6:LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'D7:LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'D8:LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'D9:LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'D10:LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'D11:LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'D12:LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'D13:LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'D14:LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'D15:LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'J1:Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Horizontal'.
+Informação: Processando o símbolo 'L_FMT_OUT1:LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R10:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R8:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R7:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R6:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R5:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R4:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R3:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R1:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'J2:Connector_PinHeader_2.54mm:PinHeader_1x14_P2.54mm_Horizontal'.
+Informação: Processando o símbolo 'L_LANG_OUT1:LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'L_PWR1:LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'L_R_IN1:LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'L_R_OUT1:LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder'.
+Informação: Processando o símbolo 'R2:Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder'.
+Reconecta U2 pino 1 de /IN_RESET_LV para /OUT_LANG_LV.
+Reconecta U2 pino 7 de /OUT_LANG para /IN_RESET.
+Reconecta U2 pino 8 de /OUT_FMT para /OUT_RESET.
+Reconecta U2 pino 5 de /OUT_FMT_LV para /OUT_RESET_LV.
+Reconecta U2 pino 2 de /OUT_RESET_LV para /OUT_FMT_LV.
+Reconecta U2 pino 11 de /OUT_RESET para /OUT_FMT.
+Reconecta U2 pino 12 de /IN_RESET para /OUT_LANG.
+Reconecta U2 pino 6 de /OUT_LANG_LV para /IN_RESET_LV.
+Atenção: Nenhuma rede foi encontrada para o componente U1 ilha TP5 (nenhum pino TP5 no símbolo).
+Atenção: Nenhuma rede foi encontrada para o componente U1 ilha D2 (nenhum pino D2 no símbolo).
+Atenção: Nenhuma rede foi encontrada para o componente U1 ilha TP5 (nenhum pino TP5 no símbolo).
+Atenção: Nenhuma rede foi encontrada para o componente U1 ilha TP1 (nenhum pino TP1 no símbolo).
+Atenção: Nenhuma rede foi encontrada para o componente U1 ilha D3 (nenhum pino D3 no símbolo).
+Atenção: Nenhuma rede foi encontrada para o componente U1 ilha TP4 (nenhum pino TP4 no símbolo).
+Atenção: Nenhuma rede foi encontrada para o componente U1 ilha TP6 (nenhum pino TP6 no símbolo).
+Atenção: Nenhuma rede foi encontrada para o componente U1 ilha TP4 (nenhum pino TP4 no símbolo).
+Atenção: Nenhuma rede foi encontrada para o componente U1 ilha D3 (nenhum pino D3 no símbolo).
+Atenção: Nenhuma rede foi encontrada para o componente U1 ilha TP3 (nenhum pino TP3 no símbolo).
+Atenção: Nenhuma rede foi encontrada para o componente U1 ilha D1 (nenhum pino D1 no símbolo).
+Atenção: Nenhuma rede foi encontrada para o componente U1 ilha D1 (nenhum pino D1 no símbolo).
+Atenção: Nenhuma rede foi encontrada para o componente U1 ilha 38 (nenhum pino 38 no símbolo).
+Atenção: Nenhuma rede foi encontrada para o componente U1 ilha D2 (nenhum pino D2 no símbolo).
+Atenção: Nenhuma rede foi encontrada para o componente U1 ilha TP6 (nenhum pino TP6 no símbolo).
+Atenção: Nenhuma rede foi encontrada para o componente U1 ilha TP2 (nenhum pino TP2 no símbolo).
+
+
+Informação: Total de avisos: 16, erros: 0.

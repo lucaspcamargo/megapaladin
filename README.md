@@ -1,6 +1,6 @@
-# megaPALadin v2
+# mega-paladin v2
 
-This is a switchless region mod for the SEGA Mega Drive, based on the Raspberry Pi Pico.
+This is a switchless region mod for the SEGA Mega Drive, and a bluetooth controller host and adapter, based on the Raspberry Pi Pico W.
 
 ![Picture of the mod after installation](doc/installed.jpg)
 
