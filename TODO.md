@@ -1,25 +1,27 @@
 # TODO 
 
-+ [ ] updated bluepad32 from develop, make it compile again
-+ [ ] figure out why Switch Pro controller crashes bluepad32!!!
-+ [ ] figure out why mouse events stop coming after a while...
++ [X] updated bluepad32 from develop, make it compile again
++ [X] figure out why Switch Pro controller crashes bluepad32!!!
++ [X] figure out why mouse events stop coming after a while...
 
 + [X] port to pico sdk, removing wifi
 + [X] use multiprocess module for processor communication
 + [X] move output control to core 1 completely
 + [X] add power led pwm and state machine
 + [X] enable bluetooth via btstack
-+ [ ] chenge core communications to queue_t
-+ [ ] create PIO peripheral for watching controller and detecting presence
-+ [ ] create PIO peripheral for simulating 3-button controller
-+ [ ] create PIO peripheral for simulating 6-button controller
-+ [ ] create PIO peripheral for simulating mouse
-+ [ ] integrate bluepad32
-+ [ ] send controller events to core 1
++ [X] change core communications to queue_t
++ [ ] send events for mouse and keyboard to core 1
++ [ ] implement abstraction for io port
++ [ ] implement different state machines for different modes of the port
++ [ ] core 1 and 0 coordinate sync and controller assignment behavior, feedback
 + [ ] core 1 operates controller PIO accordingly
-+ [ ] update readme
-+ [ ] ???
-+ [ ] profit!!!
++ [ ] HW: build first prototype (v1)
++ [ ] HW: rev. B:
+    - [ ] fix dimensions of level shifter daughter boards
+    - [ ] move Pi Pico USB port to board edge (duh!?)\
++ [ ] update installation documentation
++ [ ] update readme for V2
+
 
 ## BONUS
 

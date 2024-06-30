@@ -9,6 +9,9 @@
 #include <hardware/gpio.h>
 #include <hardware/pwm.h>
 
+#include <stdio.h>
+#include <stdarg.h>
+
 
 const unsigned char region_mapping[][2] = {
     {LANG_EN, FMT_NTSC}, // REGION_US
@@ -41,6 +44,7 @@ void core1_pwrled_update();
 void core1_pwrled_blink(uint times);
 void core1_pwrled_drone();
 void core1_pwrled_steady();
+void _core1_log_msg(const char *fmt, ...);
 
 
 void core1_main()
@@ -93,6 +97,8 @@ void core1_init()
     pwrled_state_data = 0;
     pwm_set_gpio_level(PIN_OUT_PWR_LED, PWM_FULLBRIGHT);
     core1_pwrled_update();
+
+    _core1_log_msg("Init done.");
 }
 
 void core1_loop()
@@ -100,9 +106,17 @@ void core1_loop()
     // handle reset button
     unsigned long now = time_us_64();
     btn_update(now);
+    
     if (btn_was_released())
     {
-        if(press_sync_sent)
+        if(syncing_now)
+        {
+            // sync cancel 
+            FIFOCmd req;
+            req.opcode = FC_SYNC_STOP_REQ;
+            fifo_push(&req);
+        }
+        else if(press_sync_sent)
         {
             press_sync_sent = false;
         }
@@ -171,13 +185,13 @@ void core1_loop()
                 if(bt_type != curr_type)
                 {
                     port_type_set(port, bt_type);
+                    _core1_log_msg("Port %d set to type %s.", port, device_type_str(bt_type));
                 }
             }
         }
         break;
         case FC_JOY_HOST_EVENT:
         {
-
             port_on_host_event(&core0_cmd);
         }
         break;
@@ -236,6 +250,8 @@ void core1_pwrled_update()
         if(delta > max_delta)
         {
             pwrled_state = syncing_now? PLS_DRONING : PLS_STEADY;
+            if(!syncing_now)
+                pwm_set_gpio_level(PIN_OUT_PWR_LED, PWM_FULLBRIGHT);
             pwrled_state_data = 0;
             pwrled_state_timer = now;
         }
@@ -275,4 +291,20 @@ void core1_pwrled_steady()
     pwrled_state = PLS_STEADY;
     pwrled_state_data = 0;
     pwrled_state_timer = time_us_64();
+}
+
+
+void _core1_log_msg(const char *fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    char buf[MSG_LEN_MAX];
+    snprintf(buf, MSG_LEN_MAX, fmt, args);
+    if(fifo_str_push(buf))
+    {
+            FIFOCmd cmd;
+            cmd.opcode = FC_LOG_NOTIFY;
+            fifo_push(&cmd);
+    }
+    va_end(args);
 }

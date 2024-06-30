@@ -503,7 +503,7 @@
       },
       {
         "netclass": "Power",
-        "pattern": "VSYS"
+        "pattern": "/VSYS"
       }
     ]
   },

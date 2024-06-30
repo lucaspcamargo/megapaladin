@@ -8,15 +8,17 @@
 // CONFIGS
 #define IS_PICO_W (PICO_BOARD == "pico_w")
 #define DEFAULT_REGION REGION_US
-#define CMD_BUF_SZ 64
+#define CMD_BUF_SZ 16   // normal command queue, one for each direction
+#define MSG_BUF_SZ 16   // message queue for prints from core 1
+#define MSG_LEN_MAX 64  // maximum size of core1 log string
 #define CORE0_MAIN_TIMER_INTERVAL 50  // TODO define value. seems to be in millisseconds
 #define JOY_MAX 2
 
 #define BUTTON_DEBOUNCE_US 50000        // 0.05s
 #define BUTTON_LONGPRESS_US 400000        // 0.4s
 #define BUTTON_SYNCPRESS_US 2500000        // 2.5 s
-#define BLINK_DURATION_US 50000         // 0.05s
-#define BLINK_INTERVAL_US 100000        // 0.1s
+#define BLINK_DURATION_US 75000         // 0.075s
+#define BLINK_INTERVAL_US 150000        // 0.15s
 #define SERIAL_INIT_TIMEOUT_US 1000000  // 1s
 #define RESET_DURATION_MS 200           // 0.2s
 #define FIFO_TIMEOUT_US 10              // 0.00001 s
@@ -75,6 +77,8 @@ enum FIFOCmdOpcode
 
   FC_JOY_HOST_STATUS, // 0->1, update connected devices info
   FC_JOY_HOST_EVENT,  // 0->1, information concerning controllers
+
+  FC_LOG_NOTIFY, // 1->0, asks to get a message from log queue and print it out
 } __attribute__ ((packed));
 
 enum FIFOCmdFlags

@@ -4,11 +4,13 @@
 #include <pico/util/queue.h>
 
 static queue_t q_120, q_021;
+static queue_t q_str;
 
 void fifo_init()
 {
-    queue_init(&q_120, sizeof(FIFOCmd), 8);
-    queue_init(&q_021, sizeof(FIFOCmd), 8);
+    queue_init(&q_120, sizeof(FIFOCmd), CMD_BUF_SZ);
+    queue_init(&q_021, sizeof(FIFOCmd), CMD_BUF_SZ);
+    queue_init(&q_str, MSG_LEN_MAX, MSG_BUF_SZ);
 }
 
 bool fifo_push(FIFOCmd *incmd)
@@ -19,6 +21,17 @@ bool fifo_push(FIFOCmd *incmd)
 bool fifo_pop(FIFOCmd *incmd)
 {
     return queue_try_remove(get_core_num()?&q_021:&q_120, incmd);
+}
+
+
+bool fifo_str_push(const char msg[MSG_LEN_MAX])
+{
+    return queue_try_add(&q_str, msg);
+}
+
+bool fifo_str_pop(char *msg)
+{
+    return queue_try_remove(&q_str, msg);
 }
 
 const char *region_str(enum Region r)
@@ -33,6 +46,21 @@ const char *region_str(enum Region r)
         return "JP";
     default:
         return "??";
+    }
+}
+
+const char * device_type_str(uint8_t dev_type)
+{
+    switch (dev_type)
+    {
+    case DEVICE_TYPE_NONE:
+        return "NONE";
+    case DEVICE_TYPE_JOY:
+        return "JOY";
+    case DEVICE_TYPE_MOUSE:
+        return "MOUSE";
+    default:
+        return "UNKNOWN";
     }
 }
 

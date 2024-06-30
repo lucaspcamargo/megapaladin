@@ -23,6 +23,7 @@ btstack_timer_source_t main_timer;
 char cmd_buf[CMD_BUF_SZ];
 uint8_t cmd_buf_len;
 bool usb_uart_ok = false;
+bool syncing = false;
 
 void core0_btstack_timer(btstack_timer_source_t *);
 void core0_process_core1_cmd(const FIFOCmd repl);
@@ -154,7 +155,8 @@ void core0_process_core1_cmd(const FIFOCmd repl)
         break;
     case FC_SYNC_START_REQ:
     {
-        uni_bt_enable_new_connections_safe(true);
+        syncing = true;
+        uni_bt_enable_new_connections_safe(syncing);
         FIFOCmd reply;
         reply.opcode = FC_SYNC_STATUS_REPL;
         reply.data[0] = 1;  // 1 means syncing
@@ -163,11 +165,19 @@ void core0_process_core1_cmd(const FIFOCmd repl)
     }
     case FC_SYNC_STOP_REQ:
     {
-        uni_bt_enable_new_connections_safe(false);
+        syncing = false;
+        uni_bt_enable_new_connections_safe(syncing);
         FIFOCmd reply;
         reply.opcode = FC_SYNC_STATUS_REPL;
-        reply.data[0] = 0;  // 1 means not syncing
+        reply.data[0] = 0;  // 0 means not syncing
         fifo_push(&reply);
+        break;
+    }
+    case FC_LOG_NOTIFY:
+    {
+        char buf[MSG_LEN_MAX];
+        if(fifo_str_pop(buf))
+            printf("CORE1: %s\n", buf);
         break;
     }
     default:
@@ -181,6 +191,19 @@ void core0_process_serial_cmd()
     {
         FIFOCmd c = {FC_STATUS_REQ, 0, 0, 0};
         fifo_push(&c);
+    }
+    if (!strcmp(cmd_buf, "sync"))
+    {
+        syncing = !syncing;
+        uni_bt_enable_new_connections_safe(syncing);
+        FIFOCmd reply;
+        reply.opcode = FC_SYNC_STATUS_REPL;
+        reply.data[0] = syncing? 1 : 0;
+        fifo_push(&reply);
+        if(syncing)
+            printf("Sync started.\n");
+        else
+            printf("Sync stopped.\n");
     }
     else if (!strcmp(cmd_buf, "reset"))
     {
@@ -220,7 +243,7 @@ void core0_process_serial_cmd()
     }
     else if ((!strcmp(cmd_buf, "help")) || (!strcmp(cmd_buf, "?")))
     {
-        printf("Available commands: status, reset, us, eu, jp, reboot, help, ?\n");
+        printf("Available commands: status, sync, reset, us, eu, jp, reboot, help, ?\n");
     }
     else
         printf("Unrecognized command.\nTry 'help' or '?'.\n");

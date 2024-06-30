@@ -5067,7 +5067,7 @@
 		(uuid "02d832b8-90a0-4bfe-9290-381c6221037d")
 	)
 	(label "P1_4"
-		(at 49.53 175.26 0)
+		(at 49.53 140.97 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5133,7 +5133,7 @@
 		(uuid "139fd341-ba26-4706-91f9-b6af530bac20")
 	)
 	(label "P2_3"
-		(at 49.53 149.86 0)
+		(at 49.53 166.37 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5199,7 +5199,7 @@
 		(uuid "29417b83-d05f-47ca-ba8e-c1fd94ca46f5")
 	)
 	(label "P2_2"
-		(at 49.53 152.4 0)
+		(at 49.53 163.83 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5210,7 +5210,7 @@
 		(uuid "2b5bcd7f-54ed-48d9-bbdc-996cf6777ae7")
 	)
 	(label "P1_0"
-		(at 49.53 172.72 0)
+		(at 49.53 143.51 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5221,7 +5221,7 @@
 		(uuid "2b5ec36f-23ff-4cdb-8565-75d6b8ff2f88")
 	)
 	(label "P2_4_LV"
-		(at 90.17 175.26 180)
+		(at 90.17 170.18 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5265,7 +5265,7 @@
 		(uuid "41720089-5f56-40a9-9b1b-6bed22d3fb90")
 	)
 	(label "P1_2"
-		(at 49.53 167.64 0)
+		(at 49.53 148.59 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5276,7 +5276,7 @@
 		(uuid "42be5068-540e-4b2f-b9eb-a6257a718f2f")
 	)
 	(label "P1_5"
-		(at 49.53 160.02 0)
+		(at 49.53 156.21 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5386,7 +5386,7 @@
 		(uuid "5b5a3ce5-4ff4-41ba-958f-3d7ab15d565e")
 	)
 	(label "P2_6_LV"
-		(at 90.17 170.18 180)
+		(at 90.17 175.26 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5584,7 +5584,7 @@
 		(uuid "82c92417-3db1-4363-b12c-0afb4d35565e")
 	)
 	(label "P1_3"
-		(at 49.53 165.1 0)
+		(at 49.53 151.13 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5595,7 +5595,7 @@
 		(uuid "868fd204-c6c8-476f-a57f-92849f9df92e")
 	)
 	(label "P2_5"
-		(at 49.53 144.78 0)
+		(at 49.53 171.45 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5716,7 +5716,7 @@
 		(uuid "b3e9636c-a3bf-489a-b034-e6235407fa8b")
 	)
 	(label "P2_4"
-		(at 49.53 142.24 0)
+		(at 49.53 173.99 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5826,7 +5826,7 @@
 		(uuid "c8e104dc-297c-456d-8ff9-b86b54ca8c78")
 	)
 	(label "P2_6"
-		(at 49.53 147.32 0)
+		(at 49.53 168.91 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5892,7 +5892,7 @@
 		(uuid "d83bea74-24f1-45e7-a999-cdc40a6a4f4f")
 	)
 	(label "P1_1"
-		(at 49.53 170.18 0)
+		(at 49.53 146.05 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5947,7 +5947,7 @@
 		(uuid "e62e2e79-b974-49f8-b58f-753cc73a9ff1")
 	)
 	(label "P2_0"
-		(at 49.53 157.48 0)
+		(at 49.53 158.75 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -6024,7 +6024,7 @@
 		(uuid "f1e8673f-a904-42cb-aeb8-31a8abad0d90")
 	)
 	(label "P1_6"
-		(at 49.53 162.56 0)
+		(at 49.53 153.67 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -6046,7 +6046,7 @@
 		(uuid "f4445e9c-d8ba-4bac-a484-0cb9486ee25a")
 	)
 	(label "P2_1"
-		(at 49.53 154.94 0)
+		(at 49.53 161.29 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -9111,8 +9111,7 @@
 	)
 	(symbol
 		(lib_id "Connector:Conn_01x14_Pin")
-		(at 44.45 160.02 0)
-		(mirror x)
+		(at 44.45 156.21 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -9120,7 +9119,7 @@
 		(dnp no)
 		(uuid "872b2931-6566-4674-be74-76008294fb46")
 		(property "Reference" "J2"
-			(at 48.768 178.054 0)
+			(at 48.768 138.176 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9128,7 +9127,7 @@
 			)
 		)
 		(property "Value" "ConnPorts"
-			(at 48.514 137.922 0)
+			(at 48.514 178.308 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9136,7 +9135,7 @@
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x14_P2.54mm_Horizontal"
-			(at 44.45 160.02 0)
+			(at 44.45 156.21 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9145,7 +9144,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 44.45 160.02 0)
+			(at 44.45 156.21 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9154,7 +9153,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x14, script generated"
-			(at 44.45 160.02 0)
+			(at 44.45 156.21 0)
 			(effects
 				(font
 					(size 1.27 1.27)
