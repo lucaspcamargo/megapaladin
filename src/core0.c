@@ -9,6 +9,7 @@
 #include <pico/multicore.h>
 #include <pico/flash.h>
 #include <hardware/watchdog.h>
+#include "hardware/vreg.h"
 
 #include <btstack_run_loop.h>
 #include <pico/cyw43_arch.h>
@@ -35,6 +36,9 @@ void core1_main();
 
 int main() // for core 0
 {
+    vreg_set_voltage(VREG_VOLTAGE_1_30);
+    set_sys_clock_khz(PICO_FREQ_KHZ, false);
+
     core1_preinit();
     fifo_init();
     // as soon as possible, get code in core 1 running (control)
@@ -152,6 +156,7 @@ void core0_process_core1_cmd(const FIFOCmd repl)
     {
     case FC_STATUS_REPL:
         core0_status_print((enum Region)repl.data[0],(enum Region)repl.data[1]);
+        printf("Port event counter at %d\n", (int)repl.data[2]);
         break;
     case FC_SYNC_START_REQ:
     {
@@ -187,12 +192,12 @@ void core0_process_core1_cmd(const FIFOCmd repl)
 
 void core0_process_serial_cmd()
 {
-    if (!strcmp(cmd_buf, "status"))
+    if (!strcmp(cmd_buf, "status") || !strcmp(cmd_buf, "s"))
     {
         FIFOCmd c = {FC_STATUS_REQ, 0, 0, 0};
         fifo_push(&c);
     }
-    if (!strcmp(cmd_buf, "sync"))
+    else if (!strcmp(cmd_buf, "sync"))
     {
         syncing = !syncing;
         uni_bt_enable_new_connections_safe(syncing);

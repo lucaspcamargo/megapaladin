@@ -3173,6 +3173,16 @@
 		)
 		(uuid "07af3f8f-3f7d-4a01-aba2-880cb6874c1e")
 	)
+	(polyline
+		(pts
+			(xy 80.01 167.64) (xy 80.01 175.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "07cb0e05-f0c0-4364-b928-36bbf9dda5a0")
+	)
 	(wire
 		(pts
 			(xy 254 73.66) (xy 231.14 73.66)
@@ -3293,6 +3303,16 @@
 		)
 		(uuid "14367747-ffff-4afd-91ad-383f23307d1f")
 	)
+	(polyline
+		(pts
+			(xy 99.06 35.56) (xy 99.06 33.02)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "171c9f1e-706b-485c-a092-a4ff19de3431")
+	)
 	(wire
 		(pts
 			(xy 238.76 44.45) (xy 238.76 46.99)
@@ -3312,6 +3332,16 @@
 			(type default)
 		)
 		(uuid "183f1e10-0a4c-44b1-8e2a-44f800d99e1a")
+	)
+	(polyline
+		(pts
+			(xy 99.06 35.56) (xy 99.06 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1b332e37-70d8-4cdd-b5c3-b865d0f8b530")
 	)
 	(wire
 		(pts
@@ -3543,6 +3573,16 @@
 		)
 		(uuid "3a8112a7-f2fb-43b5-9d6e-c67ed30ce24c")
 	)
+	(polyline
+		(pts
+			(xy 80.01 175.26) (xy 81.28 175.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3bfe0a79-ad9f-4e04-8dbd-3410d8f64460")
+	)
 	(wire
 		(pts
 			(xy 83.82 80.01) (xy 107.95 80.01)
@@ -3623,6 +3663,16 @@
 		)
 		(uuid "4b6279e3-79af-4d2d-8038-12740ee4f8b5")
 	)
+	(polyline
+		(pts
+			(xy 76.2 171.45) (xy 76.2 179.07)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4b7c497c-9abb-4889-b0fb-0989ace5d84f")
+	)
 	(wire
 		(pts
 			(xy 119.38 160.02) (xy 120.65 160.02)
@@ -3662,6 +3712,16 @@
 			(type default)
 		)
 		(uuid "503f0591-e4b9-4c54-9002-29545c457798")
+	)
+	(polyline
+		(pts
+			(xy 99.06 33.02) (xy 100.33 33.02)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "535dd48a-a0b3-4ee4-a1f2-c8bbda034673")
 	)
 	(wire
 		(pts
@@ -3763,6 +3823,16 @@
 		)
 		(uuid "5c1ca4c6-a0af-4d90-9a9b-5ce2f32180e5")
 	)
+	(polyline
+		(pts
+			(xy 78.74 29.21) (xy 78.74 36.83)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5e04e9e8-25c5-45f4-ab6e-6babba0b5b1b")
+	)
 	(wire
 		(pts
 			(xy 90.17 160.02) (xy 104.14 160.02)
@@ -3863,6 +3933,16 @@
 		)
 		(uuid "697f0950-e3f8-45f3-8a00-81aee64ec931")
 	)
+	(polyline
+		(pts
+			(xy 78.74 36.83) (xy 99.06 36.83)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "69cc1d38-d281-4ee9-83fc-3f0392fb8d1f")
+	)
 	(wire
 		(pts
 			(xy 254 134.62) (xy 231.14 134.62)
@@ -3932,6 +4012,16 @@
 			(type default)
 		)
 		(uuid "77d82dab-ef61-439a-9b52-1d3738fb1918")
+	)
+	(polyline
+		(pts
+			(xy 99.06 35.56) (xy 99.06 36.83)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "78533e19-0060-4053-a846-f3cc822c8621")
 	)
 	(wire
 		(pts
@@ -4013,6 +4103,16 @@
 		)
 		(uuid "7ec86995-8bec-4e68-a98a-e14e9a8fd5a1")
 	)
+	(polyline
+		(pts
+			(xy 81.28 167.64) (xy 80.01 167.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "82bafb74-3ab0-4abf-930e-799b4798e024")
+	)
 	(wire
 		(pts
 			(xy 240.03 49.53) (xy 243.84 49.53)
@@ -4052,6 +4152,16 @@
 			(type default)
 		)
 		(uuid "89941321-b3db-4cc1-91be-a86980042fc0")
+	)
+	(polyline
+		(pts
+			(xy 99.06 40.64) (xy 100.33 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8a8b8018-6acb-4cff-947d-ae3afa4b0c88")
 	)
 	(wire
 		(pts
@@ -4112,6 +4222,16 @@
 			(type default)
 		)
 		(uuid "8f4575b0-37fb-4b63-8d79-e604f7bb6775")
+	)
+	(polyline
+		(pts
+			(xy 80.01 171.45) (xy 76.2 171.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "902b80f6-2cb7-4961-9b30-8a9a8aa23e1c")
 	)
 	(wire
 		(pts
@@ -4933,6 +5053,16 @@
 		)
 		(uuid "14e4781a-754d-4276-aeae-8f789d6f1165")
 	)
+	(text "Wrong order corrected\nin PCB. If fixed here,\nalso fix there."
+		(exclude_from_sim no)
+		(at 76.708 182.88 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "38c9d661-190f-448e-8d57-37efd6734ddb")
+	)
 	(text "IO Port Blinkenlights\n(optional)"
 		(exclude_from_sim no)
 		(at 101.092 179.832 0)
@@ -4962,6 +5092,27 @@
 			)
 		)
 		(uuid "58b9e222-0f12-4b15-b14f-75ce692eb898")
+	)
+	(text "TODO: NEXT REV: For smdt support, invert these two,\nso that P2_4 == be U0_RX (MD TX),\nand that P2_6 == U0_TX (MD RX)"
+		(exclude_from_sim no)
+		(at 70.104 25.146 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "6d39b3eb-99fa-4029-a801-24e6b6fddb4e")
+	)
+	(text "Already done in program,\nneed to flip cable in proto\nand correct LED silks"
+		(exclude_from_sim no)
+		(at 80.772 41.148 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "78b7975c-9516-49eb-89ac-b214a856d0d3")
 	)
 	(text "Port 1 Shifting"
 		(exclude_from_sim no)
@@ -5221,7 +5372,7 @@
 		(uuid "2b5ec36f-23ff-4cdb-8565-75d6b8ff2f88")
 	)
 	(label "P2_4_LV"
-		(at 90.17 170.18 180)
+		(at 90.17 175.26 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5386,7 +5537,7 @@
 		(uuid "5b5a3ce5-4ff4-41ba-958f-3d7ab15d565e")
 	)
 	(label "P2_6_LV"
-		(at 90.17 175.26 180)
+		(at 90.17 170.18 180)
 		(fields_autoplaced yes)
 		(effects
 			(font

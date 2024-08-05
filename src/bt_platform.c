@@ -241,7 +241,9 @@ static void bt_platform_on_init_complete(void) {
     // Turn off LED once init is done.
     cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
 
+#if(DEBUG_BT_PLATFORM)
     uni_property_dump_all();
+#endif
 }
 
 static void bt_platform_on_device_connected(uni_hid_device_t* d) {
@@ -314,23 +316,31 @@ static void bt_platform_on_controller_data(uni_hid_device_t* d, uni_controller_t
             uint8_t idx = _bp_get_index(d);
             if(idx != 0xff)
                 _bp_send_controller_data_joy(d, ctl, idx);
+#if(DEBUG_BT_PLATFORM)
             uni_controller_dump(ctl);
+#endif
         }
         break;
         case UNI_CONTROLLER_CLASS_BALANCE_BOARD:
             // Do something
+#if(DEBUG_BT_PLATFORM)
             uni_balance_board_dump(&ctl->balance_board);
+#endif
             break;
         case UNI_CONTROLLER_CLASS_MOUSE:
             uint8_t idx = _bp_get_index(d);
             if(idx != 0xff)
                 _bp_send_controller_data_mouse(d, ctl, idx);
+#if(DEBUG_BT_PLATFORM)
             uni_controller_dump(ctl);
             uni_mouse_dump(&ctl->mouse);
+#endif
             break;
         case UNI_CONTROLLER_CLASS_KEYBOARD:
             // Do something
+#if(DEBUG_BT_PLATFORM)
             uni_keyboard_dump(&ctl->keyboard);
+#endif
             break;
         default:
             loge("Unsupported controller class: %d\n", ctl->klass);

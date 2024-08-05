@@ -65,12 +65,13 @@ void core1_preinit()
     gpio_set_dir(PIN_OUT_LANG, GPIO_OUT);
     core1_region_commit();
 
-    port_init();
+    port_preinit();
 }
 
 void core1_init()
 {
     core1_preinit();
+    port_init();
     flash_safe_execute_core_init();
 
     // reset out starts as input (hi-z)
@@ -103,6 +104,7 @@ void core1_init()
 
 void core1_loop()
 {
+    //_core1_log_msg("CORE 1 ITERATION @ %llu us", time_us_64());
     // handle reset button
     unsigned long now = time_us_64();
     btn_update(now);
@@ -151,7 +153,7 @@ void core1_loop()
             reply.opcode = FC_STATUS_REPL;
             reply.data[0] = region_curr;
             reply.data[1] = region_sel;
-            reply.data[2] = 0;
+            reply.data[2] = port_get_evt_count() % 256;
             fifo_push(&reply);
         }
         break;
@@ -296,15 +298,15 @@ void core1_pwrled_steady()
 
 void _core1_log_msg(const char *fmt, ...)
 {
+    char buf[MSG_LEN_MAX];
     va_list args;
     va_start(args, fmt);
-    char buf[MSG_LEN_MAX];
-    snprintf(buf, MSG_LEN_MAX, fmt, args);
+    vsnprintf(buf, MSG_LEN_MAX, fmt, args);
+    va_end(args);
     if(fifo_str_push(buf))
     {
-            FIFOCmd cmd;
-            cmd.opcode = FC_LOG_NOTIFY;
-            fifo_push(&cmd);
+        FIFOCmd cmd;
+        cmd.opcode = FC_LOG_NOTIFY;
+        fifo_push(&cmd);
     }
-    va_end(args);
 }
