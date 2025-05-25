@@ -29,3 +29,10 @@
 + [ ] integrate pico-flashloader
 + [ ] implement program update from bluetooth serial port
 
+
+## for V3:
+
+- use same order of bits as mega drive does: -HRL3210    
+- use contiguous pins for ports, enabling usage of PIO
+- reimplement preipheral emulation with PIO
+- PCB: use level shifter ICs

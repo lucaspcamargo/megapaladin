@@ -125,4 +125,6 @@ enum FIFOCmdFlags
 #define BIT_BTN_MODE     0x0800
 #define BIT_BTN_LMB      0x0040  // is A
 #define BIT_BTN_MMB      0x0010  // is B
-#define BIT_BTN_RMB      0x0020  // is C 
+#define BIT_BTN_RMB      0x0020  // is C
+
+#define BIT_BTN_COUNT    12

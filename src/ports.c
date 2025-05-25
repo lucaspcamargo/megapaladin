@@ -51,6 +51,7 @@ enum JoyFSMState
     JOY_STATE_STEP_COUNT
 };
 
+
 typedef struct pin_watch_data_st
 {
     bool initialized;
@@ -90,7 +91,34 @@ typedef struct irq_data_st
     uint32_t captures[JOY_STATE_STEP_COUNT];
 } irq_data_td;
 
-static const uint8_t const *port_pins[] = {port1_pins, port2_pins};
+static const uint8_t const *PORT_PINS[] = {port1_pins, port2_pins};
+static const uint8_t PORT_BTN_GPIO[PORT_COUNT][BIT_BTN_COUNT] = {{
+    PORT1_0_PIN, // up
+    PORT1_1_PIN, // down
+    PORT1_2_PIN, // left
+    PORT1_3_PIN, // right
+    PORT1_4_PIN, // A
+    PORT1_4_PIN, // B
+    PORT1_6_PIN, // C
+    PORT1_6_PIN, // start
+    PORT1_2_PIN, // X
+    PORT1_1_PIN, // Y
+    PORT1_0_PIN, // Z
+    PORT1_3_PIN, // mode
+}, {
+    PORT2_0_PIN, // up
+    PORT2_1_PIN, // down
+    PORT2_2_PIN, // left
+    PORT2_3_PIN, // right
+    PORT2_4_PIN, // A
+    PORT2_4_PIN, // B
+    PORT2_6_PIN, // C
+    PORT2_6_PIN, // start
+    PORT2_2_PIN, // X
+    PORT2_1_PIN, // Y
+    PORT2_0_PIN, // Z
+    PORT2_3_PIN, // mode
+},};
 static uint8_t port_types[PORT_COUNT];
 static port_data_td port_data[PORT_COUNT];
 static irq_data_td irq_data[PORT_COUNT];
@@ -117,7 +145,7 @@ void port_preinit()
     {
         for(uint8_t pin_i = 0; pin_i < PIN_COUNT; pin_i++)
         {
-            const uint8_t pin = port_pins[p_idx][pin_i];
+            const uint8_t pin = PORT_PINS[p_idx][pin_i];
             gpio_init(pin);
             gpio_set_dir(pin, GPIO_IN);
         }
@@ -145,8 +173,6 @@ void port_init()
 
 void port_step()
 {
-    return;
-
     for(int i = 0; i < PORT_COUNT; i++)
     {
         switch(port_types[i])
@@ -196,7 +222,7 @@ void _port_mode_setup(uint8_t port, uint8_t mode)
         case DEVICE_TYPE_NONE:
         {
             port_data[port].idle_timer = time_us_64();
-            const uint gpio = port_pins[port][PIN_IDX_TH];
+            const uint gpio = PORT_PINS[port][PIN_IDX_TH];
             gpio_set_irq_enabled(gpio, GPIO_EVT_BOTH_EDGES, true);
         }
         break;
@@ -215,7 +241,7 @@ void _port_mode_reset(uint8_t port, uint8_t mode)
     {
         case DEVICE_TYPE_NONE:
         {
-            const uint gpio = port_pins[port][PIN_IDX_TH];
+            const uint gpio = PORT_PINS[port][PIN_IDX_TH];
             gpio_set_irq_enabled(gpio, GPIO_EVT_BOTH_EDGES, false);
         }
         break;
@@ -241,10 +267,9 @@ void _port_irq(uint gpio, uint32_t evt_mask)
         {
             // controller snoop mode
             uint8_t curr_stage = irq_data[port].stage + 1;
-            const uint32_t capture = gpio_get_all();
             if(curr_stage == JOY_STATE_STEP_COUNT)
                 curr_stage = 0;
-            irq_data[port].captures[curr_stage] = capture;
+            irq_data[port].captures[curr_stage] = gpio_get_all();
             irq_data[port].stage = curr_stage;
         }
         break;
@@ -262,17 +287,28 @@ void _port_handler_snoop(uint8_t port)
     
     const uint64_t now = time_us_64();
     port_data_td *data = port_data + port;
-    const uint8_t th_pin = port_pins[port][PIN_IDX_TH];
+    const uint8_t th_pin = PORT_PINS[port][PIN_IDX_TH];
 
     // handle idle timer for resetting controller stage
     if(irq_data[port].stage == 0)
         port_data[port].idle_timer = now;
     else if(now - port_data[port].idle_timer > PORT_CYCLE_US)
     {
+        _core1_log_msg("PORT %d STAGE RESET (was %d)", port, (int) irq_data[port].stage);
         irq_data[port].stage = 0;
         port_data[port].idle_timer = now;
     }
 
+    // analyze captured data
+
+    if(irq_data[port].captures[0] != 0xffffffff && irq_data[port].captures[1] != 0xffffffff )
+    {
+        // we have two frames of controller data
+        // that makes a full 3-button controller
+        uint32_t cap0 = irq_data[port].captures[0];
+        uint32_t cap1 = irq_data[port].captures[1];
+        //_core1_log_msg("PORT %d BITS ARE %08X AND %08X (stage is %d)", port, cap0, cap1, (int) irq_data[port].stage);
+    }
 }
 
 void _port_handler_joy(uint8_t port)
