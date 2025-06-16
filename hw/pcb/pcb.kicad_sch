@@ -3499,6 +3499,26 @@
 		)
 		(uuid "e137071d-7f1b-48d6-8eb0-dde33b30b01c")
 	)
+	(text_box "Note: 4 and 5 are reversed here so that we can use the UARTs.\nThe firmware (and PIO programs) must take this into account."
+		(exclude_from_sim no)
+		(at 73.66 50.8 0)
+		(size 13.97 31.75)
+		(margins 0.9525 0.9525 0.9525 0.9525)
+		(stroke
+			(width 0)
+			(type solid)
+		)
+		(fill
+			(type none)
+		)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left top)
+		)
+		(uuid "ce549737-2d35-424b-937a-fb115329b53b")
+	)
 	(junction
 		(at 166.37 170.18)
 		(diameter 0)
