@@ -30,11 +30,11 @@
 
 #define PWM_FULLBRIGHT 0xfffe
 
-#define PIN_IN_RESET 18
-#define PIN_OUT_RESET 19
-#define PIN_OUT_FMT 20
-#define PIN_OUT_LANG 21
-#define PIN_OUT_PWR_LED 22
+#define PIN_IN_RESET 17
+#define PIN_OUT_RESET 16
+#define PIN_OUT_FMT 19
+#define PIN_OUT_LANG 18
+#define PIN_OUT_PWR_LED 27
 
 
 typedef uint64_t ulong;
