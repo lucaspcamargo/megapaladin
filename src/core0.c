@@ -8,6 +8,7 @@
 #include <pico/stdlib.h>
 #include <pico/multicore.h>
 #include <pico/flash.h>
+#include <hardware/clocks.h>
 #include <hardware/watchdog.h>
 #include "hardware/vreg.h"
 
@@ -258,11 +259,12 @@ void core0_process_serial_cmd()
 
 void core0_status_print(enum Region curr_region, enum Region sel_region)
 {
-    printf("\nmegaPALadin V%d rev. %d\n", MP_VERSION, MP_REVISION);
+    printf("\mega-paladin v%d rev. %d\n", MP_VERSION, MP_REVISION);
     printf("Current region: %s\n", region_str(curr_region));
     printf("Selected region: %s\n", region_str(sel_region));
     struct mallinfo mi = mallinfo();
-    printf("Heap mem: ", mi.fordblks," free, ", mi.arena, " total");
+    printf("System Frequency: %.03f MHz\n", clock_get_hz(clk_sys) / 1000000.f);
+    printf("Heap mem: %d free, %d total\n", mi.fordblks, mi.arena);
     printf("Core temperature: %2.1fC\n", temp_read());
     printf("Device dump:\n");
     uni_bt_dump_devices_safe();

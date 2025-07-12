@@ -3,11 +3,11 @@
 #include <pico/types.h>
 
 #define MP_VERSION 1
-#define MP_REVISION 999
+#define MP_REVISION 0
 
 // CONFIGS
 #define IS_PICO_W (PICO_BOARD == "pico_w")
-#define PICO_FREQ_KHZ 195000
+#define PICO_FREQ_KHZ 133000
 
 #define DEFAULT_REGION REGION_US
 #define CMD_BUF_SZ 16   // normal command queue, one for each direction
