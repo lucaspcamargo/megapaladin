@@ -60,7 +60,7 @@ An installation diagram is provided [here](doc/install%20plan.png). **(It needs 
 
 The 5V supply side should be protected from reverse-feeding the console via a diode. Also, the level shifters should maintain a high-impedance state on the 5V side when the console is off.
 
-I cannot guarantee this behavior, though! Weird leakage could happen, potentially damaging your console. 
+This was tested a couple of times. I cannot guarantee this behavior, though! Weird leakage could happen, potentially damaging your console. 
 
 You have been warned.
 
@@ -84,4 +84,4 @@ Contributions are welcome! Please open issues or submit pull requests for bug fi
 
 ## Contact
 
-For questions or feedback, open an issue on GitHub or reach out via [camargo.eng.br](https://camargo.eng.br/contact).
+For questions or feedback, open an issue on GitHub or reach out via [the github issues page](https://github.com/lucaspcamargo/megapaladin/issues).
