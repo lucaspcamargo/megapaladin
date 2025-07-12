@@ -15,12 +15,10 @@
 + [ ] implement different state machines for different modes of the port
 + [ ] core 1 and 0 coordinate sync and controller assignment behavior, feedback
 + [ ] core 1 operates controller PIO accordingly
-+ [ ] HW: build first prototype (v1)
-+ [ ] HW: rev. B:
-    - [ ] fix dimensions of level shifter daughter boards
-    - [ ] move Pi Pico USB port to board edge (duh!?)\
-+ [ ] update installation documentation
-+ [ ] update readme for V2
++ [X] HW: build first prototype (v1)
++ [X] HW: ~~rev. B:~~ v3:
+    - [X] ~~fix dimensions of level shifter daughter boards~~ (not needed anymore, using proper shifter ICs)
+    - [X] move Pi Pico USB port to board edge (duh!?)\
 
 
 ## BONUS
@@ -32,7 +30,10 @@
 
 ## for V3:
 
-- use same order of bits as mega drive does: -HRL3210    
-- use contiguous pins for ports, enabling usage of PIO
-- reimplement preipheral emulation with PIO
-- PCB: use level shifter ICs
+- [X] use same order of bits as mega drive does: -HRL3210
+    + pin-wise, TR and TL are inverted. This is to match UART pins for smdt
+     this will be handled transparently, internally
+- [X] use contiguous pins for ports, enabling usage of PIO
+- [ ] reimplement preipheral emulation with PIO
+- [X] PCB: use level shifter ICs
+- [ ] update docs (readme, new install guide pic.)
