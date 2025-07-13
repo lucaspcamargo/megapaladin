@@ -23,6 +23,7 @@ add_executable(megapaladin
     src/ports.c
 )
 
+pico_generate_pio_header(megapaladin ${CMAKE_CURRENT_LIST_DIR}/src/pio/sniff.pio)
 
 target_include_directories(megapaladin PRIVATE
     src
@@ -43,7 +44,8 @@ target_link_libraries(megapaladin
     hardware_adc        # internal temp reading
     hardware_pwm        # for power led
     hardware_watchdog   # for reboot
-
+    hardware_pio        # for ports
+    
     # bt and bluepad32 stuff
     pico_cyw43_arch_none
     pico_btstack_classic

@@ -84,4 +84,4 @@ Contributions are welcome! Please open issues or submit pull requests for bug fi
 
 ## Contact
 
-For questions or feedback, open an issue on GitHub or reach out via [the github issues page](https://github.com/lucaspcamargo/megapaladin/issues).
+For questions or feedback, [open an issue on GitHub](https://github.com/lucaspcamargo/megapaladin/issues).

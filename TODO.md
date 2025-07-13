@@ -26,7 +26,8 @@
 + [ ] add serial port bluetooth, same functionality as usb serial port
 + [ ] integrate pico-flashloader
 + [ ] implement program update from bluetooth serial port
-
++ [ ] have some commands to enable and configure wifi
++ [ ] have some commands to initiate a telnet (maybe also ssh) session via wifi (use lwip and maybe wolfssh)
 
 ## for V3:
 

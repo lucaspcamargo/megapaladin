@@ -1,0 +1,34 @@
+.program sniff
+; PIO program to sniff Mega Drive controller port
+; Watches for changes on the TH pin and pushes the current state to FIFO on change
+
+; Pin assignments:
+;   pin 6: TH (Trigger/Select)
+;   pins 0-5: D0-D5 (data lines)
+
+; Assumptions:
+;   - TH is connected to pin 6
+;   - Data lines D0-D5 are connected to pins 0-5
+;   - Set in/out pins accordingly in host code
+
+start:
+    ; Read TH pin and store in X
+    in    pins, 1         ; Read TH (pin 6) into ISR[31]
+    mov   x, isr          ; Save TH state in X
+wait_change:
+    in    pins, 1         ; Read TH (pin 6) into ISR[31]
+    mov   y, isr          ; Save current TH in Y
+    mov   isr, x
+    jmp   x--, wait_change ; Wait if TH unchanged (X == Y)
+    ; TH changed, sample all pins
+    in    pins, 7         ; Read TH + D0-D5 (pins 0-6) into ISR[31:25]
+    push                  ; Push to FIFO
+    mov   x, y            ; Update X with new TH
+    jmp   wait_change     ; Repeat
+
+% c-sdk {
+#include "hardware/pio.h"
+#define SNIFF_MEGADRIVE_TH_PIN 6
+#define SNIFF_MEGADRIVE_DATA_PINS 0
+#define SNIFF_MEGADRIVE_NUM_PINS 7
+%}

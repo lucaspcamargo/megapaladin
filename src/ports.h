@@ -1,6 +1,10 @@
 #pragma once
 
 #include "defs.h"
+#include <hardware/pio.h>
+
+// PIO programs
+#include "sniff.pio.h"
 
 #include <stdint.h>
 

@@ -60,6 +60,13 @@ typedef struct irq_data_st
     uint32_t captures[JOY_STATE_STEP_COUNT];
 } irq_data_td;
 
+typedef struct pio_cfg_data_st
+{
+    PIO pio;
+    uint sm;
+    uint offset;
+} pio_cfg_data_td;
+
 static const uint8_t const PORT_PIN_0[PORT_COUNT] = {PORT1_0_PIN, PORT2_0_PIN};
 static const uint8_t PORT_BTN_GPIO_OFFSET[BIT_BTN_COUNT] = {
     0, // up
@@ -78,6 +85,7 @@ static const uint8_t PORT_BTN_GPIO_OFFSET[BIT_BTN_COUNT] = {
 static uint8_t port_types[PORT_COUNT];
 static port_data_td port_data[PORT_COUNT];
 static irq_data_td irq_data[PORT_COUNT];
+static pio_cfg_data_td pio_cfg[PORT_COUNT];
 static uint64_t evt_counter;
 
 
@@ -108,13 +116,16 @@ void port_preinit()
 
 void port_init()
 {
+    // zero all internal data
     memset(port_types, 0x00, sizeof(port_types));
     memset(port_data, 0x00, sizeof(port_data));
     memset(irq_data, 0x00, sizeof(irq_data));
+    memset(pio_cfg, 0x00, sizeof(pio_cfg));
     for(uint8_t p_idx = 0; p_idx < PORT_COUNT; p_idx++)
         memset(&(irq_data[p_idx].captures), 0xff, sizeof(uint32_t)*JOY_STATE_STEP_COUNT);
     evt_counter = 0;
 
+    // start devices in "no device" mode (sniff)
     for(uint8_t p_idx = 0; p_idx < PORT_COUNT; p_idx++)
     {
         _port_mode_setup(p_idx, DEVICE_TYPE_NONE);
@@ -176,6 +187,14 @@ void _port_mode_setup(uint8_t port, uint8_t mode)
             port_data[port].idle_timer = time_us_64();
             const uint gpio_oe = PORT_PIN_0[port] + PIN_OFFSET_OE;
             gpio_put(gpio_oe, true); // set OE high
+            
+            PIO pio;
+            uint sm;
+            uint offset;
+
+            // load sniffer program in PIO
+            bool success = pio_claim_free_sm_and_add_program_for_gpio_range(&sniff_program, &pio, &sm, &offset, PORT_PIN_0[port], 7, true); 
+            hard_assert(success);
         }
         break;
         case DEVICE_TYPE_JOY:
@@ -207,10 +226,31 @@ void _port_mode_reset(uint8_t port, uint8_t mode)
 
 void _port_handler_snoop(uint8_t port)
 {
+    uint64_t now = time_us_64();
+
     // attempt to detect controller activity here
     // try to determine if port is occupied by a controller
     // as well as detect some button combinations
-    
+    // Check if PIO is setup for this port
+    PIO pio = pio_cfg[port].pio;
+    uint sm = pio_cfg[port].sm;
+    int event_count = 0;
+    if (pio != NULL) {
+        // Non-blocking: check if RX FIFO has data
+        while (!pio_sm_is_rx_fifo_empty(pio, sm)) {
+            uint32_t value = pio_sm_get(pio, sm);
+            event_count++;
+            // Process or store value as needed (example: log or buffer)
+            // check enough time has passed since last samples. if so, start processing from first fsm state
+            if (port_data[port].idle_timer + 5000U < now) {
+                port_data[port].joy.state = JOY_STATE_STEP_0_IDLE_DIRS;
+                port_data[port].idle_timer = now;
+            }
+        }
+        if (event_count > 0) {
+            _core1_log_msg("Port %d RX FIFO events: %d", port, event_count);
+        }
+    }
 }
 
 void _port_handler_joy(uint8_t port)
