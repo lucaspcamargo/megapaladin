@@ -195,6 +195,10 @@ void _port_mode_setup(uint8_t port, uint8_t mode)
             // load sniffer program in PIO
             bool success = pio_claim_free_sm_and_add_program_for_gpio_range(&sniff_program, &pio, &sm, &offset, PORT_PIN_0[port], 7, true); 
             hard_assert(success);
+
+            pio_cfg[port].pio = pio;
+            pio_cfg[port].sm = sm;
+            pio_cfg[port].offset = offset;
         }
         break;
         case DEVICE_TYPE_JOY:
@@ -213,7 +217,16 @@ void _port_mode_reset(uint8_t port, uint8_t mode)
         case DEVICE_TYPE_NONE:
         {
             const uint gpio_oe = PORT_PIN_0[port] + PIN_OFFSET_OE;
-            gpio_put(gpio_oe, false); // set OE low
+            gpio_put(gpio_oe, false); // set OE low, puts port pins on hi-Z
+
+            if(pio_cfg[port].pio != NULL)
+            {
+                // remove PIO program and unclaim state machine
+                pio_remove_program_and_unclaim_sm(&sniff_program, pio_cfg[port].pio, pio_cfg[port].sm, pio_cfg[port].offset);
+                pio_cfg[port].pio = NULL;
+                pio_cfg[port].sm = 0;
+                pio_cfg[port].offset = 0;
+            }
         }
         break;
         case DEVICE_TYPE_JOY:
