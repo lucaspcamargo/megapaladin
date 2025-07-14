@@ -196,9 +196,21 @@ void _port_mode_setup(uint8_t port, uint8_t mode)
             bool success = pio_claim_free_sm_and_add_program_for_gpio_range(&sniff_program, &pio, &sm, &offset, PORT_PIN_0[port], 7, true); 
             hard_assert(success);
 
+            // save port pio settings for later use
             pio_cfg[port].pio = pio;
             pio_cfg[port].sm = sm;
             pio_cfg[port].offset = offset;
+
+            // setup gpios to use PIO
+            for(uint8_t pin = PORT_PIN_0[port]; pin < PORT_PIN_0[port] + 7; pin++)
+                pio_gpio_init(pio, pin);
+            pio_sm_set_consecutive_pindirs(pio, sm, PORT_PIN_0[port], 7, false); // set all pins as output
+
+            // start PIO state machine
+            pio_sm_config cfg = sniff_program_get_default_config(offset);
+            hard_assert(pio_sm_init(pio, sm, offset, &cfg) == PICO_OK);
+            pio_sm_set_enabled(pio, sm, true);
+
         }
         break;
         case DEVICE_TYPE_JOY:
@@ -264,6 +276,9 @@ void _port_handler_snoop(uint8_t port)
             _core1_log_msg("Port %d RX FIFO events: %d", port, event_count);
         }
     }
+
+    // update total event counter
+    evt_counter += event_count;
 }
 
 void _port_handler_joy(uint8_t port)

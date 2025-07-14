@@ -111,7 +111,7 @@ void core1_loop()
     
     if (btn_was_released())
     {
-        if(syncing_now)
+        if(syncing_now && !press_sync_sent)
         {
             // sync cancel 
             FIFOCmd req;
