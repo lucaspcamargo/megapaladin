@@ -16,3 +16,6 @@
 [submodule "thirdparty/ki-lime-pi-to-go"]
 	path = thirdparty/ki-lime-pi-to-go
 	url = https://github.com/recursivenomad/ki-lime-pi-to-go.git
+[submodule "thirdparty/EmbeddedCLI"]
+	path = thirdparty/EmbeddedCLI
+	url = https://github.com/AndreRenaud/EmbeddedCLI.git
